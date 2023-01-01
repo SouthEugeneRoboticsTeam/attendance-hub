@@ -1,6 +1,6 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef } from 'react'
+
 import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
 import { MdWavingHand } from 'react-icons/md'
 
 export default function SignOutModal(props: { open: boolean, name: string, onClose?: () => any }) {

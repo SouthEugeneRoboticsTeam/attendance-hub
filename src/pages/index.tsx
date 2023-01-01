@@ -1,22 +1,12 @@
-import { useCallback, useState, useRef, useEffect, useMemo } from "react";
-import { invoke } from "@tauri-apps/api/tauri";
-import Image from "next/image";
-import reactLogo from "../assets/react.svg";
-import tauriLogo from "../assets/tauri.svg";
-import nextLogo from "../assets/next.svg";
+import { useCallback, useMemo, useRef, useState } from "react";
 
-import { FaAddressBook, FaBeer, FaRocket } from "react-icons/fa";
-import { GoSignIn, GoSignOut } from "react-icons/go";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
+import CheckHoursModal from "../components/CheckHoursModal";
+import CreateAccountModal from "../components/CreateAccountModal";
 import SignInModal from "../components/SignInModal";
 import SignOutModal from "../components/SignOutModal";
-
-import debounce from 'lodash/debounce';
-
 import { db } from "../utils/firestore";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import CreateAccountModal from "../components/CreateAccountModal";
-import CheckHoursModal from "../components/CheckHoursModal";
 
 enum ActionType {
   SignIn,
@@ -31,9 +21,6 @@ const ActionButtonTextMap = {
 }
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);

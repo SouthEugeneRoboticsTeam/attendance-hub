@@ -1,7 +1,7 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef } from 'react'
+
 import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
-import { MdAlarm, MdWavingHand } from 'react-icons/md'
+import { MdAlarm } from 'react-icons/md'
 
 export default function CheckHoursModal(props: { open: boolean, name: string, hours: number, onClose?: () => any }) {
   const { open, name, hours, onClose = () => {} } = props
