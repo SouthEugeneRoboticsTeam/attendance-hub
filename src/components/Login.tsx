@@ -109,6 +109,8 @@ function Login(props: LoginProps) {
     [buttonAction],
   );
   const handleActionButtonClick = useCallback(async () => {
+    if (!accountId) return;
+
     let entry = inputEntry;
     let account = inputAccount;
 
@@ -163,7 +165,7 @@ function Login(props: LoginProps) {
             type="text"
             name="account"
             id="account"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="block w-full rounded-md bg-purple-100 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             value={accountId ?? ''}
             onChange={(e) =>
               setAccountId(e.target.value.replace(/[^0-9]/g, ''))

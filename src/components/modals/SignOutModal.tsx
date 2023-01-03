@@ -1,4 +1,4 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 
 import { Dialog, Transition } from '@headlessui/react';
 import { MdWavingHand } from 'react-icons/md';
@@ -19,6 +19,11 @@ export default function SignOutModal(props: SignOutModalProps) {
   const { open, account, entry, seasonId, onClose = () => {} } = props;
 
   const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => onClose(), 3000);
+    return () => clearTimeout(timeout);
+  });
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -51,9 +56,9 @@ export default function SignOutModal(props: SignOutModalProps) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-purple-50 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-200">
                     <MdWavingHand
                       className="h-6 w-6 text-red-600"
                       aria-hidden="true"
@@ -71,7 +76,9 @@ export default function SignOutModal(props: SignOutModalProps) {
                         You have successfully signed out, and{' '}
                         <b>{millisToHours(entry?.total)} hours</b> have been
                         logged. Your new total for <b>{seasonId}</b> is{' '}
-                        <b>{millisToHours(account?.seasons[seasonId])} hours</b>
+                        <b>
+                          {millisToHours(account?.seasons?.[seasonId])} hours
+                        </b>
                         .
                       </p>
                     </div>

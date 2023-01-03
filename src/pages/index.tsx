@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import Login from '../components/Login';
 import CheckHoursModal from '../components/modals/CheckHoursModal';
+import ConfigModal from '../components/modals/ConfigModal';
 import CreateAccountModal from '../components/modals/CreateAccountModal';
 import SignInModal from '../components/modals/SignInModal';
 import SignOutModal from '../components/modals/SignOutModal';
@@ -9,58 +11,73 @@ import SignOutModal from '../components/modals/SignOutModal';
 import * as AccountModel from '../models/Account';
 import * as EntryModel from '../models/Entry';
 
+import useConfig from '../utils/useConfig';
+
 function App() {
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
   const [checkHoursModalOpen, setCheckHoursModalOpen] = useState(false);
+  const [configModalOpen, setConfigModalOpen] = useState(false);
 
   const [account, setAccount] = useState<AccountModel.Account>(null);
   const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
-  const seasonId = '2023build';
+  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), [configModalOpen]);
 
-  const signIn = useCallback(async (account: AccountModel.Account) => {
-    const entry = await EntryModel.signIn(account.id, seasonId);
+  const config = useConfig();
+  const seasonId = useMemo(() => config?.seasonId ?? 'default', [config]);
 
-    if (account) {
+  const signIn = useCallback(
+    async (account: AccountModel.Account) => {
+      const entry = await EntryModel.signIn(account.id, seasonId);
+
+      if (account) {
+        setAccount(account);
+        setEntry(entry);
+        setSignInModalOpen(true);
+      }
+    },
+    [seasonId],
+  );
+
+  const signOut = useCallback(
+    async (account: AccountModel.Account) => {
+      const entry = await EntryModel.signOut(account.id, seasonId);
+
+      // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
+      if (account.seasons[seasonId]) {
+        account.seasons[seasonId] += entry.total;
+      } else {
+        account.seasons[seasonId] = entry.total;
+      }
+
+      if (account) {
+        setAccount(account);
+        setEntry(entry);
+        setSignOutModalOpen(true);
+      }
+    },
+    [seasonId],
+  );
+
+  const createAccount = useCallback(
+    async (accountId: string, name: string) => {
+      let account = await AccountModel.getAccount(accountId);
+      let entry: EntryModel.Entry = null;
+
+      if (!account) {
+        account = await AccountModel.createAccount(accountId, name);
+      }
+
+      entry = await EntryModel.signIn(accountId, seasonId);
+
       setAccount(account);
       setEntry(entry);
       setSignInModalOpen(true);
-    }
-  }, []);
-
-  const signOut = useCallback(async (account: AccountModel.Account) => {
-    const entry = await EntryModel.signOut(account.id, seasonId);
-
-    // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
-    if (account.seasons[seasonId]) {
-      account.seasons[seasonId] += entry.total;
-    } else {
-      account.seasons[seasonId] = entry.total;
-    }
-
-    if (account) {
-      setAccount(account);
-      setEntry(entry);
-      setSignOutModalOpen(true);
-    }
-  }, []);
-
-  const createAccount = useCallback(async (accountId: string, name: string) => {
-    let account = await AccountModel.getAccount(accountId);
-    let entry: EntryModel.Entry = null;
-
-    if (!account) {
-      account = await AccountModel.createAccount(accountId, name);
-    }
-
-    entry = await EntryModel.signIn(accountId, seasonId);
-
-    setAccount(account);
-    setEntry(entry);
-    setSignInModalOpen(true);
-  }, []);
+    },
+    [seasonId],
+  );
 
   const checkHours = useCallback(async (account: AccountModel.Account) => {
     setAccount(account);
@@ -72,12 +89,12 @@ function App() {
     setCreateAccountModalOpen(true);
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     console.log(await AccountModel.getAllAccounts(seasonId))
-  //     console.log(await EntryModel.getAllEntries(seasonId, true))
-  //   })()
-  // }, [])
+  useEffect(() => {
+    // (async () => {
+    //   const accounts = await AccountModel.getAllAccounts(seasonId);
+    //   const entries = await EntryModel.getAllEntries(seasonId, true);
+    // })();
+  }, []);
 
   return (
     <>
@@ -105,6 +122,11 @@ function App() {
         account={account}
         seasonId={seasonId}
         onClose={() => setCheckHoursModalOpen(false)}
+      />
+      <ConfigModal
+        open={configModalOpen}
+        seasonId={seasonId}
+        onClose={() => setConfigModalOpen(false)}
       />
 
       <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen">
