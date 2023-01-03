@@ -8,7 +8,7 @@ type CheckHoursModalProps = {
   account: { id: string };
   createAccount: (accountId: string, name: string) => any;
   onClose?: () => any;
-}
+};
 
 export default function CreateAccountModal(props: CheckHoursModalProps) {
   const { open, account, createAccount, onClose = () => {} } = props;

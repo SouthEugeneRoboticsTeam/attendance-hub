@@ -1,4 +1,13 @@
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  FieldPath,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import { db } from '../utils/firestore';
 
 export interface AccountSeasons {
@@ -51,4 +60,19 @@ export async function createAccount(accountId: string, name: string) {
   await setDoc(doc(usersRef, accountId), account);
 
   return account;
+}
+
+/**
+ * Get all accounts from the database.
+ *
+ * @param seasonId the season id (optional)
+ * @returns the accounts
+ */
+export async function getAllAccounts(seasonId?: string) {
+  const q = seasonId
+    ? query(usersRef, where(new FieldPath('seasons', seasonId), '>', 0))
+    : usersRef;
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((i) => i.data() as Account);
 }

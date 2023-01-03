@@ -31,7 +31,7 @@ type LoginProps = {
 
 const getEntryAndAccount = async (accountId: string, seasonId: string) => {
   return Promise.all([
-    EntryModel.getCurrentEntry({ accountId, seasonId }),
+    EntryModel.getActiveEntry({ accountId, seasonId }),
     AccountModel.getAccount(accountId),
   ]);
 };

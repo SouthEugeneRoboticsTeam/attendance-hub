@@ -72,6 +72,13 @@ function App() {
     setCreateAccountModalOpen(true);
   }, []);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     console.log(await AccountModel.getAllAccounts(seasonId))
+  //     console.log(await EntryModel.getAllEntries(seasonId, true))
+  //   })()
+  // }, [])
+
   return (
     <>
       <SignInModal
@@ -109,7 +116,7 @@ function App() {
           checkHours={checkHours}
           getAccount={AccountModel.getAccount}
           getCurrentEntry={(accountId) =>
-            EntryModel.getCurrentEntry({ accountId, seasonId })
+            EntryModel.getActiveEntry({ accountId, seasonId })
           }
         />
       </main>

@@ -6,7 +6,6 @@ import {
   increment,
   query,
   runTransaction,
-  setDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '../utils/firestore';
@@ -49,7 +48,7 @@ export async function getEntries(conditions: Partial<EntryKeys>) {
  * @param conditions the conditions on which to query for entries (accountId, season)
  * @returns the current entry that matches the conditions
  */
-export async function getCurrentEntry(conditions: Partial<EntryKeys>) {
+export async function getActiveEntry(conditions: Partial<EntryKeys>) {
   const constraints = Object.entries(conditions).map(([key, value]) =>
     where(key, '==', value),
   );
@@ -57,6 +56,25 @@ export async function getCurrentEntry(conditions: Partial<EntryKeys>) {
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs[0]?.data() as Entry;
+}
+
+/**
+ * Get all entries from the database.
+ *
+ * @param seasonId the season id
+ * @param activeOnly whether to only get active entries
+ * @returns the entries that match the conditions
+ */
+export async function getAllEntries(seasonId: string, activeOnly = false) {
+  const constraints = [where('seasonId', '==', seasonId)];
+  if (activeOnly) {
+    constraints.push(where('timeOut', '==', 0));
+  }
+
+  const q = query(entriesRef, ...constraints);
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((i) => i.data() as Entry);
 }
 
 /**
