@@ -2,6 +2,7 @@ import { Fragment, useRef } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
+
 import { Account } from '../../models/Account'
 
 export default function SignInModal(props: { open: boolean, account: Account, seasonId: string, onClose?: () => any }) {

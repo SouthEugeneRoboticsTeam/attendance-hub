@@ -20,9 +20,8 @@ function App() {
 
   const seasonId = '2023build'
 
-  const signIn = useCallback(async (accountId: string) => {
-    const entry = await EntryModel.signIn(accountId, seasonId);
-    const account = await AccountModel.getAccount(accountId);
+  const signIn = useCallback(async (account: AccountModel.Account) => {
+    const entry = await EntryModel.signIn(account.id, seasonId);
 
     if (account) {
       setAccount(account);
@@ -31,12 +30,15 @@ function App() {
     }
   }, [])
 
-  const signOut = useCallback(async (accountId: string) => {
-    console.log('signOut1')
-    const entry = await EntryModel.signOut(accountId, seasonId);
-    console.log('signOut2', entry)
-    const account = await AccountModel.getAccount(accountId);
-    console.log('signOut3', account)
+  const signOut = useCallback(async (account: AccountModel.Account) => {
+    const entry = await EntryModel.signOut(account.id, seasonId);
+
+    // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
+    if (account.seasons[seasonId]) {
+      account.seasons[seasonId] += entry.total;
+    } else {
+      account.seasons[seasonId] = entry.total;
+    }
 
     if (account) {
       setAccount(account);
@@ -60,9 +62,7 @@ function App() {
     setSignInModalOpen(true);
   }, [])
 
-  const checkHours = useCallback(async (accountId: string) => {
-    const account = await AccountModel.getAccount(accountId);
-
+  const checkHours = useCallback(async (account: AccountModel.Account) => {
     setAccount(account);
     setCheckHoursModalOpen(true);
   }, [])
@@ -75,7 +75,7 @@ function App() {
   return (
     <>
       <SignInModal open={signInModalOpen} account={account} seasonId={seasonId} onClose={() => setSignInModalOpen(false)} />
-      <SignOutModal open={signOutModalOpen} account={account} seasonId={seasonId} onClose={() => setSignOutModalOpen(false)} />
+      <SignOutModal open={signOutModalOpen} account={account} entry={entry} seasonId={seasonId} onClose={() => setSignOutModalOpen(false)} />
       <CreateAccountModal open={createAccountModalOpen} account={account} createAccount={createAccount} onClose={() => setCreateAccountModalOpen(false)} />
       <CheckHoursModal open={checkHoursModalOpen} account={account} seasonId={seasonId} onClose={() => setCheckHoursModalOpen(false)} />
 

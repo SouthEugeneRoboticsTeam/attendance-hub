@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import useDebounce from "../utils/useDebounce";
 
 import * as AccountModel from "../models/Account";
 import * as EntryModel from "../models/Entry";
@@ -21,63 +23,67 @@ type LoginProps = {
   getAccount: (accountId: string) => Promise<any>
   getCurrentEntry: (accountId: string) => Promise<any>
 
-  signIn: (accountId: string) => Promise<void>
-  signOut: (accountId: string) => Promise<void>
+  signIn: (account: AccountModel.Account) => Promise<void>
+  signOut: (account: AccountModel.Account) => Promise<void>
   createAccount: (accountId: string) => Promise<void>
-  checkHours: (accountId: string) => Promise<void>
+  checkHours: (account: AccountModel.Account) => Promise<void>
+}
+
+const getEntryAndAccount = async (accountId: string, seasonId: string) => {
+  return Promise.all([
+    EntryModel.getCurrentEntry({ accountId, seasonId }),
+    AccountModel.getAccount(accountId),
+  ]);
 }
 
 function Login(props: LoginProps) {
-  const [accountId, setAccountId] = useState("")
+  const [inputAccount, setInputAccount] = useState<AccountModel.Account>(null);
+  const [inputEntry, setInputEntry] = useState<EntryModel.Entry>(null);
+
+  const [accountId, setAccountId] = useState<string>(null);
   const [buttonAction, setButtonAction] = useState(ActionType.CreateAccount);
+
+  // Only update this value every 250ms to prevent excessive database queries
+  const debouncedAccountId = useDebounce(accountId, 250);
 
   const actionButton = useRef(null)
 
-  const handleSignIn = useCallback(async () => {
-    await props.signIn(accountId);
+  const handleSignIn = useCallback(async (account: AccountModel.Account) => {
+    await props.signIn(account);
 
     setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
+    setAccountId(null);
   }, [accountId]);
 
-  const handleSignOut = useCallback(async () => {
-    console.log('calling signout')
-    await props.signOut(accountId);
+  const handleSignOut = useCallback(async (account: AccountModel.Account) => {
+    await props.signOut(account);
 
     setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
+    setAccountId(null);
   }, [accountId]);
 
   const handleCreateAccount = useCallback(async () => {
     await props.createAccount(accountId);
 
     setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
+    setAccountId(null);
   }, [accountId]);
-
-  const handleCheckHours = useCallback(async () => {
-    await props.checkHours(accountId);
-  }, [accountId]);
-
-  const handleKeyDown = useCallback(async (event: any) => {
-    if (event.key === 'Enter') {
-      actionButton.current.click();
-    }
-  }, [accountId, actionButton])
 
   useEffect(() => {
+    console.log('Doing the tihng!')
+
     if (!accountId) {
       setButtonAction(ActionType.CreateAccount);
+      setInputEntry(null);
+      setInputAccount(null);
       return;
     }
 
-    // const entry = await EntryModel.getCurrentEntry({ accountId, seasonId: props.seasonId })
-
     const updateButtons = async () => {
-      const [entry, account] = await Promise.all([
-        EntryModel.getCurrentEntry({ accountId, seasonId: props.seasonId }),
-        AccountModel.getAccount(accountId),
-      ]);
+      const [entry, account] = await getEntryAndAccount(accountId, props.seasonId);
+
+      setInputEntry(entry);
+      setInputAccount(account);
 
       if (entry) {
         setButtonAction(ActionType.SignOut);
@@ -89,16 +95,45 @@ function Login(props: LoginProps) {
     }
 
     updateButtons();
-  }, [accountId])
-
-  const ActionButtonCallbackMap = {
-    [ActionType.SignIn]: handleSignIn,
-    [ActionType.SignOut]: handleSignOut,
-    [ActionType.CreateAccount]: handleCreateAccount,
-  };
+  }, [debouncedAccountId])
 
   const actionButtonText = useMemo(() => ActionButtonTextMap[buttonAction], [buttonAction]);
-  const handleActionButtonClick = useCallback(ActionButtonCallbackMap[buttonAction], [buttonAction, accountId]);
+  const handleActionButtonClick = useCallback(async () => {
+    let entry = inputEntry;
+    let account = inputAccount;
+
+    // If we're out of sync with the database (due to debounce), update the entry and account
+    if (accountId !== account?.id) {
+      [entry, account] = await getEntryAndAccount(accountId, props.seasonId);
+    }
+
+    if (entry) {
+      handleSignOut(account);
+    } else if (account) {
+      handleSignIn(account);
+    } else {
+      handleCreateAccount();
+    }
+  }, [buttonAction, accountId, inputAccount, inputEntry]);
+
+  const handleCheckHoursClick = useCallback(async () => {
+    let account = inputAccount;
+
+    // If we're out of sync with the database (due to debounce), update the account
+    if (accountId !== account?.id) {
+      account = await AccountModel.getAccount(accountId);
+    }
+
+    await props.checkHours(account);
+
+    setAccountId(null)
+  }, [accountId, inputAccount, props.checkHours]);
+
+  const handleKeyDown = useCallback(async (event: any) => {
+    if (event.key === 'Enter') {
+      handleActionButtonClick();
+    }
+  }, [handleActionButtonClick])
 
   return (
     <>
@@ -114,10 +149,10 @@ function Login(props: LoginProps) {
             id="account"
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
 
-            value={accountId}
+            value={accountId ?? ''}
             onChange={(e) => setAccountId(e.target.value.replace(/[^0-9]/g, ""))}
 
-            onKeyUp={handleKeyDown}
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -135,7 +170,7 @@ function Login(props: LoginProps) {
           <button
             type="submit"
             className="w-[165px] justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            onClick={handleCheckHours}
+            onClick={handleCheckHoursClick}
             disabled={!accountId}
           >
             Check Hours

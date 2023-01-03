@@ -1,23 +1,31 @@
 import { Fragment, useCallback, useRef, useState } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
-import { MdWavingHand } from 'react-icons/md'
+import { MdPerson } from 'react-icons/md'
 
 export default function CreateAccountModal(props: { open: boolean, account: { id: string }, createAccount: (accountId: string, name: string) => any, onClose?: () => any }) {
   const { open, account, createAccount, onClose = () => {} } = props
 
   const [name, setName] = useState<string>(null)
 
-  const closeButtonRef = useRef(null)
+  const nameInputRef = useRef(null)
 
   const handleSubmit = useCallback(async () => {
     await createAccount(account.id, name);
     onClose();
+
+    setName(null);
   }, [account, name])
+
+  const handleKeyDown = useCallback(async (event: any) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    }
+  }, [handleSubmit])
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" initialFocus={closeButtonRef} onClose={onClose}>
+      <Dialog as="div" className="relative z-10" initialFocus={nameInputRef} onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -44,7 +52,7 @@ export default function CreateAccountModal(props: { open: boolean, account: { id
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                    <MdWavingHand className="h-6 w-6 text-purple-600" aria-hidden="true" />
+                    <MdPerson className="h-6 w-6 text-purple-600" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
@@ -52,15 +60,35 @@ export default function CreateAccountModal(props: { open: boolean, account: { id
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        You have successfully signed out, and <b>1.25 hours</b> have been logged. Your new total for <b>2023build</b> is <b>1.25 hours</b>.
+                        Welcome! You will use the ID number you just entered to sign in at the start of every day, and sign out at the end of every day. Let's finish making your account.
                       </p>
+
+                      <label htmlFor="name" className="block mt-2 text-sm text-left font-medium text-gray-700">
+                        Preferred Name
+                      </label>
+
+                      <div className="mt-1">
+                        <input
+                          type="text"
+                          name="name"
+                          id="name"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+
+                          value={name ?? ''}
+                          onChange={(e) => setName(e.target.value)}
+
+                          onKeyDown={handleKeyDown}
+
+                          ref={nameInputRef}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                   <button
                     type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
                     onClick={handleSubmit}
                   >
                     Submit
@@ -69,9 +97,8 @@ export default function CreateAccountModal(props: { open: boolean, account: { id
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                     onClick={onClose}
-                    ref={closeButtonRef}
                   >
-                    Close
+                    Cancel
                   </button>
                 </div>
               </Dialog.Panel>

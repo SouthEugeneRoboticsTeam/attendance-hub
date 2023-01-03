@@ -2,7 +2,9 @@ import { Fragment, useRef } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
 import { MdAlarm } from 'react-icons/md'
+
 import { Account } from '../../models/Account'
+import { millisToHours } from '../../utils/format'
 
 export default function CheckHoursModal(props: { open: boolean, account: Account, seasonId: string, onClose?: () => any }) {
   const { open, account, seasonId, onClose = () => {} } = props
@@ -46,8 +48,8 @@ export default function CheckHoursModal(props: { open: boolean, account: Account
                     </Dialog.Title>
                     <div className="mt-2">
                       {Object.entries(account?.seasons ?? []).map(([season, time]) => (
-                        <p className="text-sm text-gray-500">
-                          {season}: {(time / (3600 * 1000)).toFixed(2)} hours
+                        <p key={season} className="text-sm text-gray-500">
+                          {season}: {millisToHours(time)} hours
                         </p>
                       ))}
                     </div>
