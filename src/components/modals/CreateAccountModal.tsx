@@ -1,12 +1,19 @@
-import { Fragment, useRef } from 'react'
+import { Fragment, useCallback, useRef, useState } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
-import { MdAlarm } from 'react-icons/md'
+import { MdWavingHand } from 'react-icons/md'
 
-export default function CheckHoursModal(props: { open: boolean, name: string, hours: number, onClose?: () => any }) {
-  const { open, name, hours, onClose = () => {} } = props
+export default function CreateAccountModal(props: { open: boolean, account: { id: string }, createAccount: (accountId: string, name: string) => any, onClose?: () => any }) {
+  const { open, account, createAccount, onClose = () => {} } = props
+
+  const [name, setName] = useState<string>(null)
 
   const closeButtonRef = useRef(null)
+
+  const handleSubmit = useCallback(async () => {
+    await createAccount(account.id, name);
+    onClose();
+  }, [account, name])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -36,25 +43,32 @@ export default function CheckHoursModal(props: { open: boolean, name: string, ho
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                    <MdAlarm className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+                    <MdWavingHand className="h-6 w-6 text-purple-600" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                      {name}'s Time Statistics
+                      Create Account ({account?.id})
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        2023build: {hours} hours
+                        You have successfully signed out, and <b>1.25 hours</b> have been logged. Your new total for <b>2023build</b> is <b>1.25 hours</b>.
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3">
+                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
-                    onClick={() => onClose()}
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    onClick={onClose}
                     ref={closeButtonRef}
                   >
                     Close

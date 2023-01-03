@@ -1,24 +1,13 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import Login from "../components/Login";
+import CheckHoursModal from "../components/modals/CheckHoursModal";
+import CreateAccountModal from "../components/modals/CreateAccountModal";
+import SignInModal from "../components/modals/SignInModal";
+import SignOutModal from "../components/modals/SignOutModal";
 
-import CheckHoursModal from "../components/CheckHoursModal";
-import CreateAccountModal from "../components/CreateAccountModal";
-import SignInModal from "../components/SignInModal";
-import SignOutModal from "../components/SignOutModal";
-import { db } from "../utils/firestore";
-
-enum ActionType {
-  SignIn,
-  SignOut,
-  CreateAccount,
-}
-
-const ActionButtonTextMap = {
-  [ActionType.SignIn]: "Sign In",
-  [ActionType.SignOut]: "Sign Out",
-  [ActionType.CreateAccount]: "Create Account",
-}
+import * as AccountModel from "../models/Account";
+import * as EntryModel from "../models/Entry";
 
 function App() {
   const [signInModalOpen, setSignInModalOpen] = useState(false);
@@ -26,133 +15,79 @@ function App() {
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
   const [checkHoursModalOpen, setCheckHoursModalOpen] = useState(false);
 
-  const [accountId, setAccountId] = useState("");
-  const [buttonAction, setButtonAction] = useState(ActionType.CreateAccount);
+  const [account, setAccount] = useState<AccountModel.Account>(null);
+  const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
-  const actionButton = useRef(null)
+  const seasonId = '2023build'
 
-  const handleSignIn = useCallback(async () => {
-    // TODO: firebase signin
-    const usersRef = collection(db, "users");
-    await updateDoc(doc(usersRef, accountId), { signedIn: true });
+  const signIn = useCallback(async (accountId: string) => {
+    const entry = await EntryModel.signIn(accountId, seasonId);
+    const account = await AccountModel.getAccount(accountId);
 
+    if (account) {
+      setAccount(account);
+      setEntry(entry);
+      setSignInModalOpen(true);
+    }
+  }, [])
+
+  const signOut = useCallback(async (accountId: string) => {
+    console.log('signOut1')
+    const entry = await EntryModel.signOut(accountId, seasonId);
+    console.log('signOut2', entry)
+    const account = await AccountModel.getAccount(accountId);
+    console.log('signOut3', account)
+
+    if (account) {
+      setAccount(account);
+      setEntry(entry);
+      setSignOutModalOpen(true);
+    }
+  }, [])
+
+  const createAccount = useCallback(async (accountId: string, name: string) => {
+    let account = await AccountModel.getAccount(accountId);
+    let entry: EntryModel.Entry = null;
+
+    if (!account) {
+      account = await AccountModel.createAccount(accountId, name);
+    }
+
+    entry = await EntryModel.signIn(accountId, seasonId);
+
+    setAccount(account);
+    setEntry(entry);
     setSignInModalOpen(true);
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
-  }, [accountId]);
+  }, [])
 
-  const handleSignOut = useCallback(async () => {
-    // TODO: firebase signout
-    const usersRef = collection(db, "users");
-    await updateDoc(doc(usersRef, accountId), { signedIn: false });
+  const checkHours = useCallback(async (accountId: string) => {
+    const account = await AccountModel.getAccount(accountId);
 
-    setSignOutModalOpen(true);
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
-  }, [accountId]);
-
-  const handleCreateAccount = useCallback(async () => {
-    const usersRef = collection(db, "users");
-    console.log(usersRef, accountId);
-
-    await setDoc(doc(usersRef, accountId), { name: "Andrew Dassonville", signedIn: true });
-
-    setSignInModalOpen(true);
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId("");
-  }, [accountId]);
-
-  const handleCheckHours = useCallback(async () => {
-    // TODO: firebase get hours
-
+    setAccount(account);
     setCheckHoursModalOpen(true);
-  }, []);
+  }, [])
 
-  const handleKeyDown = useCallback(async (event: any) => {
-    if (event.key === 'Enter') {
-      actionButton.current.click();
-      return;
-    }
-
-    const id = event.target.value;
-
-    if (!id) {
-      setButtonAction(ActionType.CreateAccount);
-      return;
-    }
-
-    // TODO: lookup account id and change button action based on current state
-    // this should be debounced to only run once every 500ms
-    const usersRef = collection(db, "users");
-    const docSnap = await getDoc(doc(usersRef, id));
-
-    if (docSnap.exists()) {
-      const { signedIn } = docSnap.data();
-
-      setButtonAction(signedIn ? ActionType.SignOut : ActionType.SignIn);
-    } else {
-      setButtonAction(ActionType.CreateAccount);
-    }
-  }, [actionButton])
-
-
-  const ActionButtonCallbackMap = {
-    [ActionType.SignIn]: handleSignIn,
-    [ActionType.SignOut]: handleSignOut,
-    [ActionType.CreateAccount]: handleCreateAccount,
-  };
-
-  const actionButtonText = useMemo(() => ActionButtonTextMap[buttonAction], [buttonAction]);
-  const handleActionButtonClick = useCallback(ActionButtonCallbackMap[buttonAction], [buttonAction, accountId]);
+  const startCreateAccount = useCallback(async (accountId: string) => {
+    setAccount({ id: accountId } as any)
+    setCreateAccountModalOpen(true);
+  }, [])
 
   return (
     <>
-      <SignInModal open={signInModalOpen} name="Andrew Dassonville" onClose={() => setSignInModalOpen(false)} />
-      <SignOutModal open={signOutModalOpen} name="Andrew Dassonville" onClose={() => setSignOutModalOpen(false)} />
-      <CreateAccountModal open={createAccountModalOpen} onClose={() => setCreateAccountModalOpen(false)} />
-      <CheckHoursModal open={checkHoursModalOpen} name="Andrew Dassonville" hours={1.25} onClose={() => setCheckHoursModalOpen(false)} />
+      <SignInModal open={signInModalOpen} account={account} seasonId={seasonId} onClose={() => setSignInModalOpen(false)} />
+      <SignOutModal open={signOutModalOpen} account={account} seasonId={seasonId} onClose={() => setSignOutModalOpen(false)} />
+      <CreateAccountModal open={createAccountModalOpen} account={account} createAccount={createAccount} onClose={() => setCreateAccountModalOpen(false)} />
+      <CheckHoursModal open={checkHoursModalOpen} account={account} seasonId={seasonId} onClose={() => setCheckHoursModalOpen(false)} />
 
       <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen">
-        <div className="m-auto w-1/5">
-          <label htmlFor="account" className="block text-sm font-medium text-gray-700">
-            Account ID
-          </label>
-
-          <div className="mt-1">
-            <input
-              type="text"
-              name="account"
-              id="account"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-
-              value={accountId}
-              onChange={(e) => setAccountId(e.target.value.replace(/[^0-9]/g, ""))}
-
-              onKeyUp={handleKeyDown}
-            />
-          </div>
-
-          <div className="mt-1 w-full flex flex-row items-center justify-around">
-            <button
-              type="submit"
-              className="w-[165px] justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={handleActionButtonClick}
-              ref={actionButton}
-              disabled={!accountId}
-            >
-              {actionButtonText}
-            </button>
-
-            <button
-              type="submit"
-              className="w-[165px] justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={handleCheckHours}
-              disabled={!accountId}
-            >
-              Check Hours
-            </button>
-          </div>
-        </div>
+        <Login
+          seasonId={seasonId}
+          signIn={signIn}
+          signOut={signOut}
+          createAccount={startCreateAccount}
+          checkHours={checkHours}
+          getAccount={AccountModel.getAccount}
+          getCurrentEntry={(accountId) => EntryModel.getCurrentEntry({ accountId, seasonId })} />
       </main>
     </>
   );

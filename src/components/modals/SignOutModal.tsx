@@ -2,9 +2,10 @@ import { Fragment, useRef } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
 import { MdWavingHand } from 'react-icons/md'
+import { Account } from '../../models/Account'
 
-export default function SignOutModal(props: { open: boolean, name: string, onClose?: () => any }) {
-  const { open, name, onClose = () => {} } = props
+export default function SignOutModal(props: { open: boolean, account: Account, seasonId: string, onClose?: () => any }) {
+  const { open, account, seasonId, onClose = () => {} } = props
 
   const closeButtonRef = useRef(null)
 
@@ -41,7 +42,7 @@ export default function SignOutModal(props: { open: boolean, name: string, onClo
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                      Goodbye, {name}!
+                      Goodbye, {account?.name}!
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">

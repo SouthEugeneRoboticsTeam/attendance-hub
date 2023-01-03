@@ -1,10 +1,11 @@
 import { Fragment, useRef } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { MdAlarm } from 'react-icons/md'
+import { Account } from '../../models/Account'
 
-export default function SignInModal(props: { open: boolean, name: string, onClose?: () => any }) {
-  const { open, name, onClose = () => {} } = props
+export default function CheckHoursModal(props: { open: boolean, account: Account, seasonId: string, onClose?: () => any }) {
+  const { open, account, seasonId, onClose = () => {} } = props
 
   const closeButtonRef = useRef(null)
 
@@ -36,17 +37,19 @@ export default function SignInModal(props: { open: boolean, name: string, onClos
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                    <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                    <MdAlarm className="h-6 w-6 text-blue-600" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                      Welcome, {name}!
+                      {account?.name}'s Time Statistics
                     </Dialog.Title>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        You have successfully signed in.
-                      </p>
+                      {Object.entries(account?.seasons ?? []).map(([season, time]) => (
+                        <p className="text-sm text-gray-500">
+                          {season}: {(time / (3600 * 1000)).toFixed(2)} hours
+                        </p>
+                      ))}
                     </div>
                   </div>
                 </div>
