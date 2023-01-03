@@ -5,12 +5,14 @@ import { CheckIcon } from '@heroicons/react/24/outline';
 
 import { Account } from '../../models/Account';
 
-export default function SignInModal(props: {
+type SignInModalProps = {
   open: boolean;
   account: Account;
   seasonId: string;
   onClose?: () => any;
-}) {
+};
+
+export default function SignInModal(props: SignInModalProps) {
   const { open, account, seasonId, onClose = () => {} } = props;
 
   const closeButtonRef = useRef(null);

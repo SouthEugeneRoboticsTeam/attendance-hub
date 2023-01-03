@@ -6,12 +6,14 @@ import { MdAlarm } from 'react-icons/md';
 import { Account } from '../../models/Account';
 import { millisToHours } from '../../utils/format';
 
-export default function CheckHoursModal(props: {
+type CheckHoursModalProps = {
   open: boolean;
   account: Account;
   seasonId: string;
   onClose?: () => any;
-}) {
+};
+
+export default function CheckHoursModal(props: CheckHoursModalProps) {
   const { open, account, seasonId, onClose = () => {} } = props;
 
   const closeButtonRef = useRef(null);

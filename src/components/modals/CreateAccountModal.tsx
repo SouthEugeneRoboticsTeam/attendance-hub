@@ -3,12 +3,14 @@ import { Fragment, useCallback, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { MdPerson } from 'react-icons/md';
 
-export default function CreateAccountModal(props: {
+type CheckHoursModalProps = {
   open: boolean;
   account: { id: string };
   createAccount: (accountId: string, name: string) => any;
   onClose?: () => any;
-}) {
+}
+
+export default function CreateAccountModal(props: CheckHoursModalProps) {
   const { open, account, createAccount, onClose = () => {} } = props;
 
   const [name, setName] = useState<string>(null);

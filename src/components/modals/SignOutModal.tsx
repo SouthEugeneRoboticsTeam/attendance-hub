@@ -7,13 +7,15 @@ import { Account } from '../../models/Account';
 import { Entry } from '../../models/Entry';
 import { millisToHours } from '../../utils/format';
 
-export default function SignOutModal(props: {
+type SignOutModalProps = {
   open: boolean;
   account: Account;
   entry: Entry;
   seasonId: string;
   onClose?: () => any;
-}) {
+};
+
+export default function SignOutModal(props: SignOutModalProps) {
   const { open, account, entry, seasonId, onClose = () => {} } = props;
 
   const closeButtonRef = useRef(null);
