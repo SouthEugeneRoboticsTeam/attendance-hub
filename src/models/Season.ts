@@ -1,11 +1,11 @@
-import { collection, doc, getDoc } from "firebase/firestore";
-import { db } from "../utils/firestore";
+import { collection, doc, getDoc } from 'firebase/firestore';
+import { db } from '../utils/firestore';
 
 export interface Season {
   total: number;
 }
 
-const seasonsRef = collection(db, "seasons");
+const seasonsRef = collection(db, 'seasons');
 
 /**
  * Get a season from the database.
@@ -20,7 +20,7 @@ export async function getSeason(seasonId: string) {
   const season = await getDoc(seasonRef);
 
   if (!season.exists()) {
-    return null
+    return null;
   }
 
   return season.data() as Season;

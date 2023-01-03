@@ -1,5 +1,5 @@
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../utils/firestore";
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../utils/firestore';
 
 export interface AccountSeasons {
   [season: string]: number;
@@ -12,7 +12,7 @@ export interface Account {
   seasons: AccountSeasons;
 }
 
-const usersRef = collection(db, "users");
+const usersRef = collection(db, 'users');
 
 /**
  * Get an account from the database.
@@ -27,7 +27,7 @@ export async function getAccount(accountId: string) {
   const account = await getDoc(userRef);
 
   if (!account.exists()) {
-    return null
+    return null;
   }
 
   return account.data() as Account;

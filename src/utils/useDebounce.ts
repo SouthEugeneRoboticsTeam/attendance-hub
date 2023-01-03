@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export default function useDebounce(value: any, delay: number) {
   // State and setters for debounced value
@@ -14,7 +14,7 @@ export default function useDebounce(value: any, delay: number) {
       // .. within the delay period. Timeout gets cleared and restarted.
       return () => clearTimeout(handler);
     },
-    [value, delay] // Only re-call effect if value or delay changes
+    [value, delay], // Only re-call effect if value or delay changes
   );
 
   return debouncedValue;

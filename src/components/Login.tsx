@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import useDebounce from "../utils/useDebounce";
+import useDebounce from '../utils/useDebounce';
 
-import * as AccountModel from "../models/Account";
-import * as EntryModel from "../models/Entry";
+import * as AccountModel from '../models/Account';
+import * as EntryModel from '../models/Entry';
 
 enum ActionType {
   SignIn,
@@ -12,29 +12,29 @@ enum ActionType {
 }
 
 const ActionButtonTextMap = {
-  [ActionType.SignIn]: "Sign In",
-  [ActionType.SignOut]: "Sign Out",
-  [ActionType.CreateAccount]: "Create Account",
-}
+  [ActionType.SignIn]: 'Sign In',
+  [ActionType.SignOut]: 'Sign Out',
+  [ActionType.CreateAccount]: 'Create Account',
+};
 
 type LoginProps = {
-  seasonId: string
+  seasonId: string;
 
-  getAccount: (accountId: string) => Promise<any>
-  getCurrentEntry: (accountId: string) => Promise<any>
+  getAccount: (accountId: string) => Promise<any>;
+  getCurrentEntry: (accountId: string) => Promise<any>;
 
-  signIn: (account: AccountModel.Account) => Promise<void>
-  signOut: (account: AccountModel.Account) => Promise<void>
-  createAccount: (accountId: string) => Promise<void>
-  checkHours: (account: AccountModel.Account) => Promise<void>
-}
+  signIn: (account: AccountModel.Account) => Promise<void>;
+  signOut: (account: AccountModel.Account) => Promise<void>;
+  createAccount: (accountId: string) => Promise<void>;
+  checkHours: (account: AccountModel.Account) => Promise<void>;
+};
 
 const getEntryAndAccount = async (accountId: string, seasonId: string) => {
   return Promise.all([
     EntryModel.getCurrentEntry({ accountId, seasonId }),
     AccountModel.getAccount(accountId),
   ]);
-}
+};
 
 function Login(props: LoginProps) {
   const [inputAccount, setInputAccount] = useState<AccountModel.Account>(null);
@@ -46,21 +46,27 @@ function Login(props: LoginProps) {
   // Only update this value every 250ms to prevent excessive database queries
   const debouncedAccountId = useDebounce(accountId, 250);
 
-  const actionButton = useRef(null)
+  const actionButton = useRef(null);
 
-  const handleSignIn = useCallback(async (account: AccountModel.Account) => {
-    await props.signIn(account);
+  const handleSignIn = useCallback(
+    async (account: AccountModel.Account) => {
+      await props.signIn(account);
 
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId(null);
-  }, [accountId]);
+      setButtonAction(ActionType.CreateAccount);
+      setAccountId(null);
+    },
+    [accountId],
+  );
 
-  const handleSignOut = useCallback(async (account: AccountModel.Account) => {
-    await props.signOut(account);
+  const handleSignOut = useCallback(
+    async (account: AccountModel.Account) => {
+      await props.signOut(account);
 
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId(null);
-  }, [accountId]);
+      setButtonAction(ActionType.CreateAccount);
+      setAccountId(null);
+    },
+    [accountId],
+  );
 
   const handleCreateAccount = useCallback(async () => {
     await props.createAccount(accountId);
@@ -70,8 +76,6 @@ function Login(props: LoginProps) {
   }, [accountId]);
 
   useEffect(() => {
-    console.log('Doing the tihng!')
-
     if (!accountId) {
       setButtonAction(ActionType.CreateAccount);
       setInputEntry(null);
@@ -80,7 +84,10 @@ function Login(props: LoginProps) {
     }
 
     const updateButtons = async () => {
-      const [entry, account] = await getEntryAndAccount(accountId, props.seasonId);
+      const [entry, account] = await getEntryAndAccount(
+        accountId,
+        props.seasonId,
+      );
 
       setInputEntry(entry);
       setInputAccount(account);
@@ -92,12 +99,15 @@ function Login(props: LoginProps) {
       } else {
         setButtonAction(ActionType.CreateAccount);
       }
-    }
+    };
 
     updateButtons();
-  }, [debouncedAccountId])
+  }, [debouncedAccountId]);
 
-  const actionButtonText = useMemo(() => ActionButtonTextMap[buttonAction], [buttonAction]);
+  const actionButtonText = useMemo(
+    () => ActionButtonTextMap[buttonAction],
+    [buttonAction],
+  );
   const handleActionButtonClick = useCallback(async () => {
     let entry = inputEntry;
     let account = inputAccount;
@@ -126,19 +136,25 @@ function Login(props: LoginProps) {
 
     await props.checkHours(account);
 
-    setAccountId(null)
+    setAccountId(null);
   }, [accountId, inputAccount, props.checkHours]);
 
-  const handleKeyDown = useCallback(async (event: any) => {
-    if (event.key === 'Enter') {
-      handleActionButtonClick();
-    }
-  }, [handleActionButtonClick])
+  const handleKeyDown = useCallback(
+    async (event: any) => {
+      if (event.key === 'Enter') {
+        handleActionButtonClick();
+      }
+    },
+    [handleActionButtonClick],
+  );
 
   return (
     <>
       <div className="m-auto w-1/5">
-        <label htmlFor="account" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="account"
+          className="block text-sm font-medium text-gray-700"
+        >
           Account ID
         </label>
 
@@ -148,10 +164,10 @@ function Login(props: LoginProps) {
             name="account"
             id="account"
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-
             value={accountId ?? ''}
-            onChange={(e) => setAccountId(e.target.value.replace(/[^0-9]/g, ""))}
-
+            onChange={(e) =>
+              setAccountId(e.target.value.replace(/[^0-9]/g, ''))
+            }
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -178,7 +194,7 @@ function Login(props: LoginProps) {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Login
+export default Login;

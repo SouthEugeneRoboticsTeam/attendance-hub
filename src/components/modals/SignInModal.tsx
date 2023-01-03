@@ -1,18 +1,28 @@
-import { Fragment, useRef } from 'react'
+import { Fragment, useRef } from 'react';
 
-import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { Dialog, Transition } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/24/outline';
 
-import { Account } from '../../models/Account'
+import { Account } from '../../models/Account';
 
-export default function SignInModal(props: { open: boolean, account: Account, seasonId: string, onClose?: () => any }) {
-  const { open, account, seasonId, onClose = () => {} } = props
+export default function SignInModal(props: {
+  open: boolean;
+  account: Account;
+  seasonId: string;
+  onClose?: () => any;
+}) {
+  const { open, account, seasonId, onClose = () => {} } = props;
 
-  const closeButtonRef = useRef(null)
+  const closeButtonRef = useRef(null);
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" initialFocus={closeButtonRef} onClose={onClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        initialFocus={closeButtonRef}
+        onClose={onClose}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -39,10 +49,16 @@ export default function SignInModal(props: { open: boolean, account: Account, se
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                    <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                    <CheckIcon
+                      className="h-6 w-6 text-green-600"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-medium leading-6 text-gray-900"
+                    >
                       Welcome, {account?.name}!
                     </Dialog.Title>
                     <div className="mt-2">
@@ -68,8 +84,8 @@ export default function SignInModal(props: { open: boolean, account: Account, se
         </div>
       </Dialog>
     </Transition.Root>
-  )
+  );
 }
-function useParams(): { id: any; } {
+function useParams(): { id: any } {
   throw new Error('Function not implemented.');
 }

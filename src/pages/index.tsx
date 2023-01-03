@@ -1,13 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
 
-import Login from "../components/Login";
-import CheckHoursModal from "../components/modals/CheckHoursModal";
-import CreateAccountModal from "../components/modals/CreateAccountModal";
-import SignInModal from "../components/modals/SignInModal";
-import SignOutModal from "../components/modals/SignOutModal";
+import Login from '../components/Login';
+import CheckHoursModal from '../components/modals/CheckHoursModal';
+import CreateAccountModal from '../components/modals/CreateAccountModal';
+import SignInModal from '../components/modals/SignInModal';
+import SignOutModal from '../components/modals/SignOutModal';
 
-import * as AccountModel from "../models/Account";
-import * as EntryModel from "../models/Entry";
+import * as AccountModel from '../models/Account';
+import * as EntryModel from '../models/Entry';
 
 function App() {
   const [signInModalOpen, setSignInModalOpen] = useState(false);
@@ -18,7 +18,7 @@ function App() {
   const [account, setAccount] = useState<AccountModel.Account>(null);
   const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
-  const seasonId = '2023build'
+  const seasonId = '2023build';
 
   const signIn = useCallback(async (account: AccountModel.Account) => {
     const entry = await EntryModel.signIn(account.id, seasonId);
@@ -28,7 +28,7 @@ function App() {
       setEntry(entry);
       setSignInModalOpen(true);
     }
-  }, [])
+  }, []);
 
   const signOut = useCallback(async (account: AccountModel.Account) => {
     const entry = await EntryModel.signOut(account.id, seasonId);
@@ -45,7 +45,7 @@ function App() {
       setEntry(entry);
       setSignOutModalOpen(true);
     }
-  }, [])
+  }, []);
 
   const createAccount = useCallback(async (accountId: string, name: string) => {
     let account = await AccountModel.getAccount(accountId);
@@ -60,24 +60,45 @@ function App() {
     setAccount(account);
     setEntry(entry);
     setSignInModalOpen(true);
-  }, [])
+  }, []);
 
   const checkHours = useCallback(async (account: AccountModel.Account) => {
     setAccount(account);
     setCheckHoursModalOpen(true);
-  }, [])
+  }, []);
 
   const startCreateAccount = useCallback(async (accountId: string) => {
-    setAccount({ id: accountId } as any)
+    setAccount({ id: accountId } as any);
     setCreateAccountModalOpen(true);
-  }, [])
+  }, []);
 
   return (
     <>
-      <SignInModal open={signInModalOpen} account={account} seasonId={seasonId} onClose={() => setSignInModalOpen(false)} />
-      <SignOutModal open={signOutModalOpen} account={account} entry={entry} seasonId={seasonId} onClose={() => setSignOutModalOpen(false)} />
-      <CreateAccountModal open={createAccountModalOpen} account={account} createAccount={createAccount} onClose={() => setCreateAccountModalOpen(false)} />
-      <CheckHoursModal open={checkHoursModalOpen} account={account} seasonId={seasonId} onClose={() => setCheckHoursModalOpen(false)} />
+      <SignInModal
+        open={signInModalOpen}
+        account={account}
+        seasonId={seasonId}
+        onClose={() => setSignInModalOpen(false)}
+      />
+      <SignOutModal
+        open={signOutModalOpen}
+        account={account}
+        entry={entry}
+        seasonId={seasonId}
+        onClose={() => setSignOutModalOpen(false)}
+      />
+      <CreateAccountModal
+        open={createAccountModalOpen}
+        account={account}
+        createAccount={createAccount}
+        onClose={() => setCreateAccountModalOpen(false)}
+      />
+      <CheckHoursModal
+        open={checkHoursModalOpen}
+        account={account}
+        seasonId={seasonId}
+        onClose={() => setCheckHoursModalOpen(false)}
+      />
 
       <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen">
         <Login
@@ -87,7 +108,10 @@ function App() {
           createAccount={startCreateAccount}
           checkHours={checkHours}
           getAccount={AccountModel.getAccount}
-          getCurrentEntry={(accountId) => EntryModel.getCurrentEntry({ accountId, seasonId })} />
+          getCurrentEntry={(accountId) =>
+            EntryModel.getCurrentEntry({ accountId, seasonId })
+          }
+        />
       </main>
     </>
   );
