@@ -64,11 +64,11 @@ export default function CreateAccountModal(props: CheckHoursModalProps) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-purple-50 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-violet-50 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-200">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-violet-200">
                     <MdPerson
-                      className="h-6 w-6 text-purple-600"
+                      className="h-6 w-6 text-violet-600"
                       aria-hidden="true"
                     />
                   </div>

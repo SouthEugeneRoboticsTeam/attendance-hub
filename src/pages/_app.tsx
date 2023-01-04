@@ -4,7 +4,7 @@ import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <div className="min-h-full bg-purple-200">
+    <div className="min-h-full">
       <Component {...pageProps} />
     </div>
   );

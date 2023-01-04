@@ -55,7 +55,7 @@ function Login(props: LoginProps) {
       setButtonAction(ActionType.CreateAccount);
       setAccountId(null);
     },
-    [accountId],
+    [],
   );
 
   const handleSignOut = useCallback(
@@ -65,7 +65,7 @@ function Login(props: LoginProps) {
       setButtonAction(ActionType.CreateAccount);
       setAccountId(null);
     },
-    [accountId],
+    [],
   );
 
   const handleCreateAccount = useCallback(async () => {
@@ -73,7 +73,7 @@ function Login(props: LoginProps) {
 
     setButtonAction(ActionType.CreateAccount);
     setAccountId(null);
-  }, [accountId]);
+  }, []);
 
   useEffect(() => {
     if (!accountId) {
@@ -152,32 +152,29 @@ function Login(props: LoginProps) {
 
   return (
     <>
-      <div className="m-auto w-1/5">
+      {/* <div className="m-auto w-1/5">
         <label
           htmlFor="account"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium"
         >
           Account ID
         </label>
 
-        <div className="mt-1">
-          <input
-            type="text"
-            name="account"
-            id="account"
-            className="block w-full rounded-md bg-purple-100 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            value={accountId ?? ''}
-            onChange={(e) =>
-              setAccountId(e.target.value.replace(/[^0-9]/g, ''))
-            }
-            onKeyDown={handleKeyDown}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Type here"
+          className="input input-bordered input-primary w-full"
+          value={accountId ?? ''}
+          onChange={(e) =>
+            setAccountId(e.target.value.replace(/[^0-9]/g, ''))
+          }
+          onKeyDown={handleKeyDown}
+        />
 
-        <div className="mt-1 w-full flex flex-row items-center justify-around">
+        <div className="mt-4 w-full flex flex-row items-center justify-around">
           <button
             type="submit"
-            className="w-[165px] justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="btn btn-primary min-w-[200px] w-[45%] justify-center"
             onClick={handleActionButtonClick}
             ref={actionButton}
             disabled={!accountId}
@@ -187,12 +184,58 @@ function Login(props: LoginProps) {
 
           <button
             type="submit"
-            className="w-[165px] justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="btn btn-secondary min-w-[200px] w-[45%] justify-center"
             onClick={handleCheckHoursClick}
             disabled={!accountId}
           >
             Check Hours
           </button>
+        </div>
+      </div> */}
+
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content gap-8 flex-col lg:flex-row-reverse lg:max-w-4xl">
+          <div className="text-center lg:text-left">
+            <h1 className="text-5xl font-bold">SERT 2521</h1>
+            <p className="py-6">Welcome to the South Eugene Robotics Team. Please sign in using this form when you arrive, and sign out at the end of the day before you leave!</p>
+          </div>
+          <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
+            <div className="card-body">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Account ID</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="account id"
+                  className="input input-bordered"
+                  value={accountId ?? ''}
+                  onChange={(e) =>
+                    setAccountId(e.target.value.replace(/[^0-9]/g, ''))
+                  }
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <div className="form-control mt-4 grid grid-cols-2 items-center justify-center gap-4">
+                <button
+                  className="btn btn-primary flex-grow"
+                  onClick={handleActionButtonClick}
+                  ref={actionButton}
+                  disabled={!accountId}
+                >
+                  {actionButtonText}
+                </button>
+
+                <button
+                  className="btn btn-secondary flex-grow"
+                  onClick={handleCheckHoursClick}
+                  disabled={!accountId}
+                >
+                  Check Hours
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>

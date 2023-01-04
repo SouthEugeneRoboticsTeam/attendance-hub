@@ -43,6 +43,7 @@ function App() {
 
   const signOut = useCallback(
     async (account: AccountModel.Account) => {
+      console.log('Sign Out Entrymodel', account.id, seasonId)
       const entry = await EntryModel.signOut(account.id, seasonId);
 
       // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
@@ -129,7 +130,7 @@ function App() {
         onClose={() => setConfigModalOpen(false)}
       />
 
-      <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen">
+      {/* <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen"> */}
         <Login
           seasonId={seasonId}
           signIn={signIn}
@@ -141,7 +142,7 @@ function App() {
             EntryModel.getActiveEntry({ accountId, seasonId })
           }
         />
-      </main>
+      {/* </main> */}
     </>
   );
 }
