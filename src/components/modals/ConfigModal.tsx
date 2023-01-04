@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { writeTextFile, BaseDirectory, createDir } from '@tauri-apps/api/fs';
 
 import { Dialog, Transition } from '@headlessui/react';
 import { MdSettings, MdWarning } from 'react-icons/md';
@@ -21,6 +21,7 @@ export default function ConfigModal(props: ConfigModalProps) {
   const handleSave = useCallback(async () => {
     const config = { seasonId: seasonIdValue };
 
+    await createDir('.', { dir: BaseDirectory.AppConfig, recursive: true });
     await writeTextFile('config.json', JSON.stringify(config), {
       dir: BaseDirectory.AppConfig,
     });

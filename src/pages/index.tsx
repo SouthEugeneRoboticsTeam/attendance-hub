@@ -133,10 +133,6 @@ function App() {
           signOut={signOut}
           createAccount={startCreateAccount}
           checkHours={checkHours}
-          getAccount={AccountModel.getAccount}
-          getCurrentEntry={(accountId) =>
-            EntryModel.getActiveEntry({ accountId, seasonId })
-          }
         />
       {/* </main> */}
     </>

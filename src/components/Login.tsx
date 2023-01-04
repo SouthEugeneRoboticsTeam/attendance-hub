@@ -21,9 +21,6 @@ type LoginProps = {
   seasonId: string;
   disabled: boolean;
 
-  getAccount: (accountId: string) => Promise<any>;
-  getCurrentEntry: (accountId: string) => Promise<any>;
-
   signIn: (account: AccountModel.Account) => Promise<void>;
   signOut: (account: AccountModel.Account) => Promise<void>;
   createAccount: (accountId: string) => void;
@@ -59,7 +56,6 @@ function Login(props: LoginProps) {
 
   const handleSignIn = useCallback(
     (account: AccountModel.Account) => {
-      console.log('SignIn', working)
       setWorking(true);
       props.signIn(account).then(() => {
         setWorking(false);
@@ -116,7 +112,7 @@ function Login(props: LoginProps) {
     };
 
     updateButtons();
-  }, [debouncedAccountId]);
+  }, [debouncedAccountId, props.seasonId]);
 
   const actionButtonText = useMemo(
     () => ActionButtonTextMap[buttonAction],
@@ -140,7 +136,7 @@ function Login(props: LoginProps) {
     } else {
       handleCreateAccount(accountId);
     }
-  }, [buttonAction, accountId, inputAccount, inputEntry]);
+  }, [buttonAction, accountId, inputAccount, inputEntry, props.seasonId]);
 
   const handleCheckHoursClick = useCallback(async () => {
     let account = inputAccount;
