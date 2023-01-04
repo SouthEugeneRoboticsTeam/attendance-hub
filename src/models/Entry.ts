@@ -85,7 +85,9 @@ export async function getAllEntries(seasonId: string, activeOnly = false) {
  * @returns the entry that was created
  */
 export async function signIn(accountId: string, seasonId: string) {
+  console.log('Sign In', accountId, seasonId)
   const timeIn = Date.now();
+
   const entry = {
     accountId,
     seasonId,
@@ -106,6 +108,7 @@ export async function signIn(accountId: string, seasonId: string) {
  * @param seasonId the current season
  */
 export async function signOut(accountId: string, seasonId: string) {
+  console.log('Sign Out', accountId, seasonId)
   const timeOut = Date.now();
 
   const q = query(

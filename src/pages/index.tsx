@@ -20,6 +20,9 @@ function App() {
   const [checkHoursModalOpen, setCheckHoursModalOpen] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
 
+  const modals = [signInModalOpen, signOutModalOpen, createAccountModalOpen, checkHoursModalOpen, configModalOpen];
+  const modalOpen = useMemo(() => modals.some(Boolean), modals);
+
   const [account, setAccount] = useState<AccountModel.Account>(null);
   const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
@@ -43,7 +46,6 @@ function App() {
 
   const signOut = useCallback(
     async (account: AccountModel.Account) => {
-      console.log('Sign Out Entrymodel', account.id, seasonId)
       const entry = await EntryModel.signOut(account.id, seasonId);
 
       // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
@@ -80,21 +82,14 @@ function App() {
     [seasonId],
   );
 
-  const checkHours = useCallback(async (account: AccountModel.Account) => {
+  const checkHours = useCallback((account: AccountModel.Account) => {
     setAccount(account);
     setCheckHoursModalOpen(true);
   }, []);
 
-  const startCreateAccount = useCallback(async (accountId: string) => {
+  const startCreateAccount = useCallback((accountId: string) => {
     setAccount({ id: accountId } as any);
     setCreateAccountModalOpen(true);
-  }, []);
-
-  useEffect(() => {
-    // (async () => {
-    //   const accounts = await AccountModel.getAllAccounts(seasonId);
-    //   const entries = await EntryModel.getAllEntries(seasonId, true);
-    // })();
   }, []);
 
   return (
@@ -133,6 +128,7 @@ function App() {
       {/* <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen"> */}
         <Login
           seasonId={seasonId}
+          disabled={modalOpen}
           signIn={signIn}
           signOut={signOut}
           createAccount={startCreateAccount}

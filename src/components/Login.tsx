@@ -19,14 +19,15 @@ const ActionButtonTextMap = {
 
 type LoginProps = {
   seasonId: string;
+  disabled: boolean;
 
   getAccount: (accountId: string) => Promise<any>;
   getCurrentEntry: (accountId: string) => Promise<any>;
 
   signIn: (account: AccountModel.Account) => Promise<void>;
   signOut: (account: AccountModel.Account) => Promise<void>;
-  createAccount: (accountId: string) => Promise<void>;
-  checkHours: (account: AccountModel.Account) => Promise<void>;
+  createAccount: (accountId: string) => void;
+  checkHours: (account: AccountModel.Account) => void;
 };
 
 const getEntryAndAccount = async (accountId: string, seasonId: string) => {
@@ -39,6 +40,7 @@ const getEntryAndAccount = async (accountId: string, seasonId: string) => {
 function Login(props: LoginProps) {
   const [inputAccount, setInputAccount] = useState<AccountModel.Account>(null);
   const [inputEntry, setInputEntry] = useState<EntryModel.Entry>(null);
+  const [working, setWorking] = useState(false);
 
   const [accountId, setAccountId] = useState<string>(null);
   const [buttonAction, setButtonAction] = useState(ActionType.CreateAccount);
@@ -46,30 +48,42 @@ function Login(props: LoginProps) {
   // Only update this value every 250ms to prevent excessive database queries
   const debouncedAccountId = useDebounce(accountId, 250);
 
-  const actionButton = useRef(null);
+  const inputRef = useRef(null);
+  const actionButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!props.disabled) {
+      inputRef.current.focus();
+    }
+  }, [props.disabled]);
 
   const handleSignIn = useCallback(
-    async (account: AccountModel.Account) => {
-      await props.signIn(account);
-
-      setButtonAction(ActionType.CreateAccount);
-      setAccountId(null);
+    (account: AccountModel.Account) => {
+      console.log('SignIn', working)
+      setWorking(true);
+      props.signIn(account).then(() => {
+        setWorking(false);
+        setButtonAction(ActionType.CreateAccount);
+        setAccountId(null);
+      });
     },
-    [],
+    [working],
   );
 
   const handleSignOut = useCallback(
-    async (account: AccountModel.Account) => {
-      await props.signOut(account);
-
-      setButtonAction(ActionType.CreateAccount);
-      setAccountId(null);
+    (account: AccountModel.Account) => {
+      setWorking(true);
+      props.signOut(account).then(() => {
+        setWorking(false);
+        setButtonAction(ActionType.CreateAccount);
+        setAccountId(null);
+      });
     },
-    [],
+    [working],
   );
 
-  const handleCreateAccount = useCallback(async () => {
-    await props.createAccount(accountId);
+  const handleCreateAccount = useCallback((accountId: string) => {
+    props.createAccount(accountId);
 
     setButtonAction(ActionType.CreateAccount);
     setAccountId(null);
@@ -124,7 +138,7 @@ function Login(props: LoginProps) {
     } else if (account) {
       handleSignIn(account);
     } else {
-      handleCreateAccount();
+      handleCreateAccount(accountId);
     }
   }, [buttonAction, accountId, inputAccount, inputEntry]);
 
@@ -144,7 +158,8 @@ function Login(props: LoginProps) {
   const handleKeyDown = useCallback(
     async (event: any) => {
       if (event.key === 'Enter') {
-        handleActionButtonClick();
+        // handleActionButtonClick();
+        actionButtonRef.current.click()
       }
     },
     [handleActionButtonClick],
@@ -152,47 +167,6 @@ function Login(props: LoginProps) {
 
   return (
     <>
-      {/* <div className="m-auto w-1/5">
-        <label
-          htmlFor="account"
-          className="block text-sm font-medium"
-        >
-          Account ID
-        </label>
-
-        <input
-          type="text"
-          placeholder="Type here"
-          className="input input-bordered input-primary w-full"
-          value={accountId ?? ''}
-          onChange={(e) =>
-            setAccountId(e.target.value.replace(/[^0-9]/g, ''))
-          }
-          onKeyDown={handleKeyDown}
-        />
-
-        <div className="mt-4 w-full flex flex-row items-center justify-around">
-          <button
-            type="submit"
-            className="btn btn-primary min-w-[200px] w-[45%] justify-center"
-            onClick={handleActionButtonClick}
-            ref={actionButton}
-            disabled={!accountId}
-          >
-            {actionButtonText}
-          </button>
-
-          <button
-            type="submit"
-            className="btn btn-secondary min-w-[200px] w-[45%] justify-center"
-            onClick={handleCheckHoursClick}
-            disabled={!accountId}
-          >
-            Check Hours
-          </button>
-        </div>
-      </div> */}
-
       <div className="hero min-h-screen bg-base-200">
         <div className="hero-content gap-8 flex-col lg:flex-row-reverse lg:max-w-4xl">
           <div className="text-center lg:text-left">
@@ -209,19 +183,21 @@ function Login(props: LoginProps) {
                   type="text"
                   placeholder="account id"
                   className="input input-bordered"
+                  disabled={props.disabled || working}
                   value={accountId ?? ''}
                   onChange={(e) =>
                     setAccountId(e.target.value.replace(/[^0-9]/g, ''))
                   }
                   onKeyDown={handleKeyDown}
+                  ref={inputRef}
                 />
               </div>
               <div className="form-control mt-4 grid grid-cols-2 items-center justify-center gap-4">
                 <button
                   className="btn btn-primary flex-grow"
                   onClick={handleActionButtonClick}
-                  ref={actionButton}
-                  disabled={!accountId}
+                  ref={actionButtonRef}
+                  disabled={!accountId || working || props.disabled}
                 >
                   {actionButtonText}
                 </button>
@@ -229,7 +205,7 @@ function Login(props: LoginProps) {
                 <button
                   className="btn btn-secondary flex-grow"
                   onClick={handleCheckHoursClick}
-                  disabled={!accountId}
+                  disabled={!accountId || working || props.disabled}
                 >
                   Check Hours
                 </button>
