@@ -63,7 +63,7 @@ function Login(props: LoginProps) {
         setAccountId(null);
       });
     },
-    [working],
+    [working, props.signIn],
   );
 
   const handleSignOut = useCallback(
@@ -75,7 +75,7 @@ function Login(props: LoginProps) {
         setAccountId(null);
       });
     },
-    [working],
+    [working, props.signOut],
   );
 
   const handleCreateAccount = useCallback((accountId: string) => {
@@ -83,7 +83,7 @@ function Login(props: LoginProps) {
 
     setButtonAction(ActionType.CreateAccount);
     setAccountId(null);
-  }, []);
+  }, [props.createAccount]);
 
   useEffect(() => {
     if (!accountId) {
@@ -146,7 +146,7 @@ function Login(props: LoginProps) {
       account = await AccountModel.getAccount(accountId);
     }
 
-    await props.checkHours(account);
+    props.checkHours(account);
 
     setAccountId(null);
   }, [accountId, inputAccount, props.checkHours]);
@@ -158,7 +158,7 @@ function Login(props: LoginProps) {
         actionButtonRef.current.click()
       }
     },
-    [handleActionButtonClick],
+    [],
   );
 
   return (
@@ -184,6 +184,7 @@ function Login(props: LoginProps) {
                   onChange={(e) =>
                     setAccountId(e.target.value.replace(/[^0-9]/g, ''))
                   }
+                  onBlur={(e) => e.target.focus()}
                   onKeyDown={handleKeyDown}
                   ref={inputRef}
                 />
