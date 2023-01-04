@@ -1,7 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react';
-
-import { Dialog, Transition } from '@headlessui/react';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { useEffect, useRef } from 'react';
 
 import { Account } from '../../models/Account';
 

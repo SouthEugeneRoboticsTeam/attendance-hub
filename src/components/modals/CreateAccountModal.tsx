@@ -1,7 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-
-import { Dialog, Transition } from '@headlessui/react';
-import { MdPerson } from 'react-icons/md';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type CheckHoursModalProps = {
   open: boolean;

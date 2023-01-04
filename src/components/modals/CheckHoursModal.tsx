@@ -1,7 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react';
-
-import { Dialog, Transition } from '@headlessui/react';
-import { MdAlarm } from 'react-icons/md';
+import { useEffect, useRef } from 'react';
 
 import { Account } from '../../models/Account';
 import { millisToHours } from '../../utils/format';

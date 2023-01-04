@@ -1,7 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react';
-
-import { Dialog, Transition } from '@headlessui/react';
-import { MdWavingHand } from 'react-icons/md';
+import { useEffect, useRef } from 'react';
 
 import { Account } from '../../models/Account';
 import { Entry } from '../../models/Entry';

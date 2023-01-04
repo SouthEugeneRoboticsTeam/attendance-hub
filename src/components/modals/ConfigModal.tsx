@@ -1,8 +1,8 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { writeTextFile, BaseDirectory, createDir } from '@tauri-apps/api/fs';
+import { useCallback, useEffect, useState } from 'react';
 
-import { Dialog, Transition } from '@headlessui/react';
-import { MdSettings, MdWarning } from 'react-icons/md';
+import { BaseDirectory, createDir, writeTextFile } from '@tauri-apps/api/fs';
+import { MdWarning } from 'react-icons/md';
+
 import { setConfigValue } from '../../utils/useConfig';
 
 type ConfigModalProps = {
