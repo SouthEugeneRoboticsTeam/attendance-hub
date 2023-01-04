@@ -26,7 +26,7 @@ function App() {
   const [account, setAccount] = useState<AccountModel.Account>(null);
   const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
-  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), [configModalOpen]);
+  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), { enableOnFormTags: true });
 
   const config = useConfig();
   const seasonId = useMemo(() => config?.seasonId ?? 'default', [config]);

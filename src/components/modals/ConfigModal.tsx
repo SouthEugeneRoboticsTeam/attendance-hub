@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { BaseDirectory, createDir, writeTextFile } from '@tauri-apps/api/fs';
 import { MdWarning } from 'react-icons/md';
+import { themeChange } from 'theme-change';
 
 import { setConfigValue } from '../../utils/useConfig';
+import { themes } from '../../constants/themes';
 
 type ConfigModalProps = {
   open: boolean;
@@ -17,6 +19,7 @@ export default function ConfigModal(props: ConfigModalProps) {
   const [seasonIdValue, setSeasonIdValue] = useState<string>(seasonId);
 
   useEffect(() => setSeasonIdValue(seasonId), [seasonId]);
+  useEffect(() => themeChange(false), [])
 
   const handleSave = useCallback(async () => {
     const config = { seasonId: seasonIdValue };
@@ -38,13 +41,13 @@ export default function ConfigModal(props: ConfigModalProps) {
 
         <div className="mt-2 flex flex-col">
           <div className="flex flex-row gap-5">
-            <MdWarning className="h-12 w-12 text-yellow-500" />
+            <MdWarning className="h-12 w-12 text-warning" />
             <p className="text-sm text-gray-500">
               Be careful when changing these settings. Modifying
               values here may reset attendance data for the current
               season.
             </p>
-            <MdWarning className="h-12 w-12 text-yellow-500" />
+            <MdWarning className="h-12 w-12 text-warning" />
           </div>
 
           <div className="overflow-x-auto mt-4">
@@ -57,12 +60,20 @@ export default function ConfigModal(props: ConfigModalProps) {
                       type="text"
                       name="name"
                       id="name"
-                      className="input input-bordered input-primary w-full"
+                      className="input input-bordered w-full"
                       value={seasonIdValue ?? ''}
                       onChange={(e) =>
                         setSeasonIdValue(e.target.value)
                       }
                     />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="text-right">Style</td>
+                  <td>
+                    <select className="select select-bordered w-full max-w-xs" data-choose-theme>
+                      {themes.map(i => <option value={i} key={i}>{i}</option>)}
+                    </select>
                   </td>
                 </tr>
               </tbody>
