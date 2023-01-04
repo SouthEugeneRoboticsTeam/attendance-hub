@@ -47,9 +47,9 @@ export default function CreateAccountModal(props: CheckHoursModalProps) {
 
         <div className="mt-2 flex flex-col">
           <p className="text-sm mb-4">
-            Welcome! You will use the ID number you just entered to
-            sign in at the start of every day, and sign out at the
-            end of every day. Let's finish making your account.
+            Welcome! You will use the ID number you just entered to sign in at
+            the start of every day, and sign out at the end of every day. Let's
+            finish making your account.
           </p>
 
           {/* <label
@@ -74,15 +74,10 @@ export default function CreateAccountModal(props: CheckHoursModalProps) {
               ref={nameInputRef}
             />
           </div>
-
         </div>
 
         <div className="modal-action">
-          <button
-            type="button"
-            className="btn"
-            onClick={onClose}
-          >
+          <button type="button" className="btn" onClick={onClose}>
             Cancel
           </button>
           <button
@@ -144,31 +139,31 @@ export default function CreateAccountModal(props: CheckHoursModalProps) {
   //                     Create Account ({account?.id})
   //                   </Dialog.Title>
   //                   <div className="mt-2">
-                      // <p className="text-sm text-gray-500">
-                      //   Welcome! You will use the ID number you just entered to
-                      //   sign in at the start of every day, and sign out at the
-                      //   end of every day. Let's finish making your account.
-                      // </p>
+  // <p className="text-sm text-gray-500">
+  //   Welcome! You will use the ID number you just entered to
+  //   sign in at the start of every day, and sign out at the
+  //   end of every day. Let's finish making your account.
+  // </p>
 
-                      // <label
-                      //   htmlFor="name"
-                      //   className="block mt-2 text-sm text-left font-medium text-gray-700"
-                      // >
-                      //   Preferred Name
-                      // </label>
+  // <label
+  //   htmlFor="name"
+  //   className="block mt-2 text-sm text-left font-medium text-gray-700"
+  // >
+  //   Preferred Name
+  // </label>
 
-                      // <div className="mt-1">
-                      //   <input
-                      //     type="text"
-                      //     name="name"
-                      //     id="name"
-                      //     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      //     value={name ?? ''}
-                      //     onChange={(e) => setName(e.target.value)}
-                      //     onKeyDown={handleKeyDown}
-                      //     ref={nameInputRef}
-                      //   />
-                      // </div>
+  // <div className="mt-1">
+  //   <input
+  //     type="text"
+  //     name="name"
+  //     id="name"
+  //     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //     value={name ?? ''}
+  //     onChange={(e) => setName(e.target.value)}
+  //     onKeyDown={handleKeyDown}
+  //     ref={nameInputRef}
+  //   />
+  // </div>
   //                   </div>
   //                 </div>
   //               </div>

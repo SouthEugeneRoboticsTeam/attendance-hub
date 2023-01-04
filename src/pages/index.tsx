@@ -20,13 +20,21 @@ function App() {
   const [checkHoursModalOpen, setCheckHoursModalOpen] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
 
-  const modals = [signInModalOpen, signOutModalOpen, createAccountModalOpen, checkHoursModalOpen, configModalOpen];
+  const modals = [
+    signInModalOpen,
+    signOutModalOpen,
+    createAccountModalOpen,
+    checkHoursModalOpen,
+    configModalOpen,
+  ];
   const modalOpen = useMemo(() => modals.some(Boolean), modals);
 
   const [account, setAccount] = useState<AccountModel.Account>(null);
   const [entry, setEntry] = useState<EntryModel.Entry>(null);
 
-  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), { enableOnFormTags: true });
+  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), {
+    enableOnFormTags: true,
+  });
 
   const config = useConfig();
   const seasonId = useMemo(() => config?.seasonId ?? 'default', [config]);
@@ -126,14 +134,14 @@ function App() {
       />
 
       {/* <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen"> */}
-        <Login
-          seasonId={seasonId}
-          disabled={modalOpen}
-          signIn={signIn}
-          signOut={signOut}
-          createAccount={startCreateAccount}
-          checkHours={checkHours}
-        />
+      <Login
+        seasonId={seasonId}
+        disabled={modalOpen}
+        signIn={signIn}
+        signOut={signOut}
+        createAccount={startCreateAccount}
+        checkHours={checkHours}
+      />
       {/* </main> */}
     </>
   );

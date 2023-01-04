@@ -54,7 +54,9 @@ export default function CheckHoursModal(props: CheckHoursModalProps) {
         </div>
 
         <div className="modal-action">
-          <button className="btn" onClick={onClose} ref={closeButtonRef}>Close</button>
+          <button className="btn" onClick={onClose} ref={closeButtonRef}>
+            Close
+          </button>
         </div>
       </div>
     </div>

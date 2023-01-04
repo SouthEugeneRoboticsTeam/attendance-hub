@@ -29,13 +29,13 @@ export default function SignInModal(props: SignInModalProps) {
         <h3 className="font-bold text-lg">Welcome, {account?.name}!</h3>
 
         <div className="mt-2">
-          <p className="text-sm">
-            You have successfully signed in.
-          </p>
+          <p className="text-sm">You have successfully signed in.</p>
         </div>
 
         <div className="modal-action">
-          <button className="btn" onClick={onClose} ref={closeButtonRef}>Close</button>
+          <button className="btn" onClick={onClose} ref={closeButtonRef}>
+            Close
+          </button>
         </div>
       </div>
     </div>

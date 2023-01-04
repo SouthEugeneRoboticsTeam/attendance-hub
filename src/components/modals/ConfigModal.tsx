@@ -19,7 +19,7 @@ export default function ConfigModal(props: ConfigModalProps) {
   const [seasonIdValue, setSeasonIdValue] = useState<string>(seasonId);
 
   useEffect(() => setSeasonIdValue(seasonId), [seasonId]);
-  useEffect(() => themeChange(false), [])
+  useEffect(() => themeChange(false), []);
 
   const handleSave = useCallback(async () => {
     const config = { seasonId: seasonIdValue };
@@ -43,9 +43,8 @@ export default function ConfigModal(props: ConfigModalProps) {
           <div className="flex flex-row gap-5">
             <MdWarning className="h-12 w-12 text-warning" />
             <p className="text-sm text-gray-500">
-              Be careful when changing these settings. Modifying
-              values here may reset attendance data for the current
-              season.
+              Be careful when changing these settings. Modifying values here may
+              reset attendance data for the current season.
             </p>
             <MdWarning className="h-12 w-12 text-warning" />
           </div>
@@ -62,17 +61,22 @@ export default function ConfigModal(props: ConfigModalProps) {
                       id="name"
                       className="input input-bordered w-full"
                       value={seasonIdValue ?? ''}
-                      onChange={(e) =>
-                        setSeasonIdValue(e.target.value)
-                      }
+                      onChange={(e) => setSeasonIdValue(e.target.value)}
                     />
                   </td>
                 </tr>
                 <tr>
                   <td className="text-right">Style</td>
                   <td>
-                    <select className="select select-bordered w-full max-w-xs" data-choose-theme>
-                      {themes.map(i => <option value={i} key={i}>{i}</option>)}
+                    <select
+                      className="select select-bordered w-full max-w-xs"
+                      data-choose-theme
+                    >
+                      {themes.map((i) => (
+                        <option value={i} key={i}>
+                          {i}
+                        </option>
+                      ))}
                     </select>
                   </td>
                 </tr>
@@ -82,11 +86,7 @@ export default function ConfigModal(props: ConfigModalProps) {
         </div>
 
         <div className="modal-action">
-          <button
-            type="button"
-            className="btn"
-            onClick={onClose}
-          >
+          <button type="button" className="btn" onClick={onClose}>
             Cancel
           </button>
           <button

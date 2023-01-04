@@ -34,17 +34,16 @@ export default function SignOutModal(props: SignOutModalProps) {
         <div className="mt-2">
           <p className="text-sm">
             You have successfully signed out, and{' '}
-            <b>{millisToHours(entry?.total)} hours</b> have been
-            logged. Your new total for <b>{seasonId}</b> is{' '}
-            <b>
-              {millisToHours(account?.seasons?.[seasonId])} hours
-            </b>
-            .
+            <b>{millisToHours(entry?.total)} hours</b> have been logged. Your
+            new total for <b>{seasonId}</b> is{' '}
+            <b>{millisToHours(account?.seasons?.[seasonId])} hours</b>.
           </p>
         </div>
 
         <div className="modal-action">
-          <button className="btn" onClick={onClose} ref={closeButtonRef}>Close</button>
+          <button className="btn" onClick={onClose} ref={closeButtonRef}>
+            Close
+          </button>
         </div>
       </div>
     </div>

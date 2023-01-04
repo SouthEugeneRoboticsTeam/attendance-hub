@@ -78,12 +78,15 @@ function Login(props: LoginProps) {
     [working, props.signOut],
   );
 
-  const handleCreateAccount = useCallback((accountId: string) => {
-    props.createAccount(accountId);
+  const handleCreateAccount = useCallback(
+    (accountId: string) => {
+      props.createAccount(accountId);
 
-    setButtonAction(ActionType.CreateAccount);
-    setAccountId(null);
-  }, [props.createAccount]);
+      setButtonAction(ActionType.CreateAccount);
+      setAccountId(null);
+    },
+    [props.createAccount],
+  );
 
   useEffect(() => {
     if (!accountId) {
@@ -151,15 +154,12 @@ function Login(props: LoginProps) {
     setAccountId(null);
   }, [accountId, inputAccount, props.checkHours]);
 
-  const handleKeyDown = useCallback(
-    async (event: any) => {
-      if (event.key === 'Enter') {
-        // handleActionButtonClick();
-        actionButtonRef.current.click()
-      }
-    },
-    [],
-  );
+  const handleKeyDown = useCallback(async (event: any) => {
+    if (event.key === 'Enter') {
+      // handleActionButtonClick();
+      actionButtonRef.current.click();
+    }
+  }, []);
 
   return (
     <>
@@ -167,7 +167,11 @@ function Login(props: LoginProps) {
         <div className="hero-content gap-8 flex-col max-w-xl lg:flex-row-reverse lg:max-w-4xl">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">SERT 2521</h1>
-            <p className="py-6">Welcome to the South Eugene Robotics Team. Please sign in using this form when you arrive, and sign out at the end of the day before you leave!</p>
+            <p className="py-6">
+              Welcome to the South Eugene Robotics Team. Please sign in using
+              this form when you arrive, and sign out at the end of the day
+              before you leave!
+            </p>
           </div>
           <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
             <div className="card-body">
