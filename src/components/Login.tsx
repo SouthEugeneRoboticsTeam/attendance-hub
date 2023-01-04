@@ -164,7 +164,7 @@ function Login(props: LoginProps) {
   return (
     <>
       <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content gap-8 flex-col lg:flex-row-reverse lg:max-w-4xl">
+        <div className="hero-content gap-8 flex-col max-w-xl lg:flex-row-reverse lg:max-w-4xl">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">SERT 2521</h1>
             <p className="py-6">Welcome to the South Eugene Robotics Team. Please sign in using this form when you arrive, and sign out at the end of the day before you leave!</p>
