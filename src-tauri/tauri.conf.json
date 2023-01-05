@@ -66,11 +66,11 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
         "title": "SERT Attendance",
-        "width": 800
+        "fullscreen": false,
+        "resizable": true,
+        "width": 1920,
+        "height": 1080
       }
     ]
   }
