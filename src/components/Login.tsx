@@ -35,22 +35,24 @@ const getEntryAndAccount = async (accountId: string, seasonId: string) => {
 };
 
 function Login(props: LoginProps) {
-  const [inputAccount, setInputAccount] = useState<AccountModel.Account>(null);
-  const [inputEntry, setInputEntry] = useState<EntryModel.Entry>(null);
+  const [inputAccount, setInputAccount] = useState<AccountModel.Account | null>(
+    null,
+  );
+  const [inputEntry, setInputEntry] = useState<EntryModel.Entry | null>(null);
   const [working, setWorking] = useState(false);
 
-  const [accountId, setAccountId] = useState<string>(null);
+  const [accountId, setAccountId] = useState<string | null>(null);
   const [buttonAction, setButtonAction] = useState(ActionType.CreateAccount);
 
   // Only update this value every 250ms to prevent excessive database queries
   const debouncedAccountId = useDebounce(accountId, 250);
 
-  const inputRef = useRef(null);
-  const actionButtonRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const actionButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!props.disabled) {
-      inputRef.current.focus();
+      inputRef.current?.focus();
     }
   }, [props.disabled]);
 
@@ -132,7 +134,7 @@ function Login(props: LoginProps) {
       [entry, account] = await getEntryAndAccount(accountId, props.seasonId);
     }
 
-    if (entry) {
+    if (account && entry) {
       handleSignOut(account);
     } else if (account) {
       handleSignIn(account);
@@ -145,9 +147,11 @@ function Login(props: LoginProps) {
     let account = inputAccount;
 
     // If we're out of sync with the database (due to debounce), update the account
-    if (accountId !== account?.id) {
+    if (accountId && accountId !== account?.id) {
       account = await AccountModel.getAccount(accountId);
     }
+
+    if (!account) return;
 
     props.checkHours(account);
 
@@ -157,61 +161,54 @@ function Login(props: LoginProps) {
   const handleKeyDown = useCallback(async (event: any) => {
     if (event.key === 'Enter') {
       // handleActionButtonClick();
-      actionButtonRef.current.click();
+      actionButtonRef.current?.click();
     }
   }, []);
 
   return (
     <>
-      <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content gap-8 flex-col max-w-xl lg:flex-row-reverse lg:max-w-4xl">
-          <div className="text-center lg:text-left">
-            <h1 className="text-5xl font-bold">SERT 2521</h1>
-            <p className="py-6">
-              Welcome to the South Eugene Robotics Team. Please sign in using
-              this form when you arrive, and sign out at the end of the day
-              before you leave!
-            </p>
+      <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
+        <div className="card-body">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Account ID</span>
+            </label>
+            <input
+              type="text"
+              placeholder="account id"
+              className="input input-bordered"
+              disabled={props.disabled || working}
+              value={accountId ?? ''}
+              onChange={(e) =>
+                setAccountId(e.target.value.replace(/[^0-9]/g, ''))
+              }
+              onBlur={(e) => e.target.focus()}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+            />
           </div>
-          <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100">
-            <div className="card-body">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Account ID</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="account id"
-                  className="input input-bordered"
-                  disabled={props.disabled || working}
-                  value={accountId ?? ''}
-                  onChange={(e) =>
-                    setAccountId(e.target.value.replace(/[^0-9]/g, ''))
-                  }
-                  onBlur={(e) => e.target.focus()}
-                  onKeyDown={handleKeyDown}
-                  ref={inputRef}
-                />
-              </div>
-              <div className="form-control mt-4 grid grid-cols-2 items-center justify-center gap-4">
-                <button
-                  className="btn btn-primary flex-grow"
-                  onClick={handleActionButtonClick}
-                  ref={actionButtonRef}
-                  disabled={!accountId || working || props.disabled}
-                >
-                  {actionButtonText}
-                </button>
+          <div className="form-control mt-4 grid grid-cols-2 items-center justify-center gap-4">
+            <button
+              className="btn btn-primary flex-grow"
+              onClick={handleActionButtonClick}
+              ref={actionButtonRef}
+              disabled={!accountId || working || props.disabled}
+            >
+              {actionButtonText}
+            </button>
 
-                <button
-                  className="btn btn-secondary flex-grow"
-                  onClick={handleCheckHoursClick}
-                  disabled={!accountId || working || props.disabled}
-                >
-                  Check Hours
-                </button>
-              </div>
-            </div>
+            <button
+              className="btn btn-secondary flex-grow"
+              onClick={handleCheckHoursClick}
+              disabled={
+                buttonAction === ActionType.CreateAccount ||
+                !accountId ||
+                working ||
+                props.disabled
+              }
+            >
+              Check Hours
+            </button>
           </div>
         </div>
       </div>

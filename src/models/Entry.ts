@@ -6,25 +6,26 @@ import {
   increment,
   query,
   runTransaction,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '../utils/firestore';
 
-export class EntryKeys {
+export interface EntryKeys {
   accountId: string;
   seasonId: string;
 }
 
-export class Entry extends EntryKeys {
+export interface Entry extends EntryKeys {
   timeIn: number;
   timeOut: number;
 
   total?: number;
 }
 
-const entriesRef = collection(db, 'entries');
-const usersRef = collection(db, 'users');
-const seasonsRef = collection(db, 'seasons');
+const getEntriesRef = () => collection(db!!, 'entries');
+const getUsersRef = () => collection(db!!, 'users');
+const getSeasonsRef = () => collection(db!!, 'seasons');
 
 /**
  * Get entries from the database.
@@ -36,7 +37,7 @@ export async function getEntries(conditions: Partial<EntryKeys>) {
   const constraints = Object.entries(conditions).map(([key, value]) =>
     where(key, '==', value),
   );
-  const q = query(entriesRef, ...constraints);
+  const q = query(getEntriesRef(), ...constraints);
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((doc) => doc.data()) as Entry[];
@@ -52,7 +53,7 @@ export async function getActiveEntry(conditions: Partial<EntryKeys>) {
   const constraints = Object.entries(conditions).map(([key, value]) =>
     where(key, '==', value),
   );
-  const q = query(entriesRef, ...constraints, where('timeOut', '==', 0));
+  const q = query(getEntriesRef(), ...constraints, where('timeOut', '==', 0));
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs[0]?.data() as Entry;
@@ -65,13 +66,21 @@ export async function getActiveEntry(conditions: Partial<EntryKeys>) {
  * @param activeOnly whether to only get active entries
  * @returns the entries that match the conditions
  */
-export async function getAllEntries(seasonId: string, activeOnly = false) {
-  const constraints = [where('seasonId', '==', seasonId)];
+export async function getAllEntries(
+  seasonId: string | null = null,
+  activeOnly = false,
+) {
+  const constraints = [];
+
+  if (seasonId) {
+    constraints.push(where('seasonId', '==', seasonId));
+  }
+
   if (activeOnly) {
     constraints.push(where('timeOut', '==', 0));
   }
 
-  const q = query(entriesRef, ...constraints);
+  const q = query(getEntriesRef(), ...constraints);
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((i) => i.data() as Entry);
@@ -95,7 +104,7 @@ export async function signIn(accountId: string, seasonId: string) {
     timeOut: 0,
   } as Entry;
 
-  await addDoc(entriesRef, entry);
+  await addDoc(getEntriesRef(), entry);
 
   return entry;
 }
@@ -105,12 +114,17 @@ export async function signIn(accountId: string, seasonId: string) {
  *
  * @param accountId the account id of the user
  * @param seasonId the current season
+ * @param forfeitTime whether to forfeit the logged time (i.e. do not tally the time with the user's total)
  */
-export async function signOut(accountId: string, seasonId: string) {
+export async function signOut(
+  accountId: string,
+  seasonId: string,
+  forfeitTime = false,
+) {
   const timeOut = Date.now();
 
   const q = query(
-    entriesRef,
+    getEntriesRef(),
     where('accountId', '==', accountId),
     where('seasonId', '==', seasonId),
     where('timeOut', '==', 0),
@@ -126,21 +140,28 @@ export async function signOut(accountId: string, seasonId: string) {
 
   const total = timeOut - entry.timeIn;
 
-  await runTransaction(db, async (transaction) => {
-    const userDoc = doc(usersRef, accountId);
-    const seasonDoc = doc(seasonsRef, seasonId);
+  if (forfeitTime) {
+    // Do not tally the time with the user's total
+    await updateDoc(entryDoc, { timeOut: -1, total: 0 });
+  } else {
+    await runTransaction(db!!, async (transaction) => {
+      const userDoc = doc(getUsersRef(), accountId);
+      const seasonDoc = doc(getSeasonsRef(), seasonId);
 
-    const season = await transaction.get(seasonDoc);
+      const season = await transaction.get(seasonDoc);
 
-    transaction.update(entryDoc, { timeOut, total });
-    transaction.update(userDoc, { [`seasons.${seasonId}`]: increment(total) });
+      transaction.update(entryDoc, { timeOut, total });
+      transaction.update(userDoc, {
+        [`seasons.${seasonId}`]: increment(total),
+      });
 
-    if (season.exists()) {
-      transaction.update(seasonDoc, { total: increment(total) });
-    } else {
-      transaction.set(seasonDoc, { total });
-    }
-  });
+      if (season.exists()) {
+        transaction.update(seasonDoc, { total: increment(total) });
+      } else {
+        transaction.set(seasonDoc, { total });
+      }
+    });
+  }
 
   return { ...entry, timeOut, total } as Entry;
 }

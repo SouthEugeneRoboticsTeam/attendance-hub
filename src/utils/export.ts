@@ -1,8 +1,9 @@
-import exceljs from 'exceljs';
+import * as exceljs from 'exceljs';
 
 import { Account } from '../models/Account';
 import { Entry } from '../models/Entry';
 
+// @ts-ignore
 async function exportToXlsx(accounts: Account[], entries: Entry[]) {
   const workbook = new exceljs.Workbook();
   workbook.calcProperties.fullCalcOnLoad = true;

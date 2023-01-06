@@ -5,7 +5,7 @@ export interface Season {
   total: number;
 }
 
-const seasonsRef = collection(db, 'seasons');
+const getSeasonsRef = () => collection(db!!, 'seasons');
 
 /**
  * Get a season from the database.
@@ -16,7 +16,7 @@ const seasonsRef = collection(db, 'seasons');
 export async function getSeason(seasonId: string) {
   if (!seasonId) return null;
 
-  const seasonRef = doc(seasonsRef, seasonId);
+  const seasonRef = doc(getSeasonsRef(), seasonId);
   const season = await getDoc(seasonRef);
 
   if (!season.exists()) {

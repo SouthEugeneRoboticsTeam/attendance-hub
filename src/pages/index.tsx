@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import Login from '../components/Login';
@@ -10,10 +10,13 @@ import SignOutModal from '../components/modals/SignOutModal';
 
 import * as AccountModel from '../models/Account';
 import * as EntryModel from '../models/Entry';
+import { db } from '../utils/firestore';
 
 import useConfig from '../utils/useConfig';
 
 function App() {
+  const [showDbWarning, setShowDbWarning] = useState(false);
+
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
@@ -29,8 +32,8 @@ function App() {
   ];
   const modalOpen = useMemo(() => modals.some(Boolean), modals);
 
-  const [account, setAccount] = useState<AccountModel.Account>(null);
-  const [entry, setEntry] = useState<EntryModel.Entry>(null);
+  const [account, setAccount] = useState<AccountModel.Account | null>(null);
+  const [entry, setEntry] = useState<EntryModel.Entry | null>(null);
 
   useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), {
     enableOnFormTags: true,
@@ -58,9 +61,9 @@ function App() {
 
       // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
       if (account.seasons[seasonId]) {
-        account.seasons[seasonId] += entry.total;
+        account.seasons[seasonId] += entry.total ?? 0;
       } else {
-        account.seasons[seasonId] = entry.total;
+        account.seasons[seasonId] = entry.total ?? 0;
       }
 
       if (account) {
@@ -75,7 +78,7 @@ function App() {
   const createAccount = useCallback(
     async (accountId: string, name: string) => {
       let account = await AccountModel.getAccount(accountId);
-      let entry: EntryModel.Entry = null;
+      let entry: EntryModel.Entry | null = null;
 
       if (!account) {
         account = await AccountModel.createAccount(accountId, name);
@@ -99,6 +102,20 @@ function App() {
     setAccount({ id: accountId } as any);
     setCreateAccountModalOpen(true);
   }, []);
+
+  useEffect(() => {
+    if (!db) {
+      setShowDbWarning(true);
+    }
+  }, [db]);
+
+  if (showDbWarning) {
+    return (
+      <h1>
+        Please configure <code>firebase.json</code> and restart the app.
+      </h1>
+    );
+  }
 
   return (
     <>
@@ -133,16 +150,29 @@ function App() {
         onClose={() => setConfigModalOpen(false)}
       />
 
-      {/* <main className="flex mx-auto px-4 sm:px-6 lg:px-8 pt-10 h-screen"> */}
-      <Login
-        seasonId={seasonId}
-        disabled={modalOpen}
-        signIn={signIn}
-        signOut={signOut}
-        createAccount={startCreateAccount}
-        checkHours={checkHours}
-      />
-      {/* </main> */}
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content flex flex-col  min-h-full justify-center max-w-xl lg:max-w-4xl">
+          <div className="flex flex-col lg:flex-row-reverse gap-8">
+            <div className="text-center lg:text-left">
+              <h1 className="text-5xl font-bold">SERT 2521</h1>
+              <p className="py-6">
+                Welcome to the South Eugene Robotics Team. Please sign in using
+                this form when you arrive, and sign out at the end of the day
+                before you leave!
+              </p>
+            </div>
+
+            <Login
+              seasonId={seasonId}
+              disabled={modalOpen}
+              signIn={signIn}
+              signOut={signOut}
+              createAccount={startCreateAccount}
+              checkHours={checkHours}
+            />
+          </div>
+        </div>
+      </div>
     </>
   );
 }

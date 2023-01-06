@@ -1,7 +1,7 @@
 import { BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { useEffect, useState } from 'react';
 
-export let setConfigValue: (value: any) => void = null;
+export let setConfigValue: (value: any) => void = () => {};
 
 export default function useConfig() {
   const [value, setValue] = useState<any>(null);

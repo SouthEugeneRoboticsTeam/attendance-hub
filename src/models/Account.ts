@@ -21,7 +21,7 @@ export interface Account {
   seasons: AccountSeasons;
 }
 
-const usersRef = collection(db, 'users');
+const getUsersRef = () => collection(db!!, 'users');
 
 /**
  * Get an account from the database.
@@ -32,7 +32,7 @@ const usersRef = collection(db, 'users');
 export async function getAccount(accountId: string) {
   if (!accountId) return null;
 
-  const userRef = doc(usersRef, accountId);
+  const userRef = doc(getUsersRef(), accountId);
   const account = await getDoc(userRef);
 
   if (!account.exists()) {
@@ -57,7 +57,7 @@ export async function createAccount(accountId: string, name: string) {
     seasons: {},
   } as Account;
 
-  await setDoc(doc(usersRef, accountId), account);
+  await setDoc(doc(getUsersRef(), accountId), account);
 
   return account;
 }
@@ -70,8 +70,8 @@ export async function createAccount(accountId: string, name: string) {
  */
 export async function getAllAccounts(seasonId?: string) {
   const q = seasonId
-    ? query(usersRef, where(new FieldPath('seasons', seasonId), '>', 0))
-    : usersRef;
+    ? query(getUsersRef(), where(new FieldPath('seasons', seasonId), '>', 0))
+    : getUsersRef();
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((i) => i.data() as Account);

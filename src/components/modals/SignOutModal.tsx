@@ -6,8 +6,8 @@ import { millisToHours } from '../../utils/format';
 
 type SignOutModalProps = {
   open: boolean;
-  account: Account;
-  entry: Entry;
+  account: Account | null;
+  entry: Entry | null;
   seasonId: string;
   onClose?: () => any;
 };
@@ -15,11 +15,11 @@ type SignOutModalProps = {
 export default function SignOutModal(props: SignOutModalProps) {
   const { open, account, entry, seasonId, onClose = () => {} } = props;
 
-  const closeButtonRef = useRef(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (open) {
-      setTimeout(() => closeButtonRef.current.focus(), 50);
+      setTimeout(() => closeButtonRef.current?.focus(), 50);
 
       const timeout = setTimeout(() => onClose(), 4000);
       return () => clearTimeout(timeout);
@@ -34,9 +34,9 @@ export default function SignOutModal(props: SignOutModalProps) {
         <div className="mt-2">
           <p className="text-sm">
             You have successfully signed out, and{' '}
-            <b>{millisToHours(entry?.total)} hours</b> have been logged. Your
-            new total for <b>{seasonId}</b> is{' '}
-            <b>{millisToHours(account?.seasons?.[seasonId])} hours</b>.
+            <b>{millisToHours(entry?.total ?? 0)} hours</b> have been logged.
+            Your new total for <b>{seasonId}</b> is{' '}
+            <b>{millisToHours(account?.seasons?.[seasonId] ?? 0)} hours</b>.
           </p>
         </div>
 

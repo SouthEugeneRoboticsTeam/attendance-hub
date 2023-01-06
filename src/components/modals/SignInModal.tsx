@@ -4,7 +4,7 @@ import { Account } from '../../models/Account';
 
 type SignInModalProps = {
   open: boolean;
-  account: Account;
+  account: Account | null;
   seasonId: string;
   onClose?: () => any;
 };
@@ -12,11 +12,11 @@ type SignInModalProps = {
 export default function SignInModal(props: SignInModalProps) {
   const { open, account, seasonId, onClose = () => {} } = props;
 
-  const closeButtonRef = useRef(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (open) {
-      setTimeout(() => closeButtonRef.current.focus(), 50);
+      setTimeout(() => closeButtonRef.current?.focus(), 50);
 
       const timeout = setTimeout(() => onClose(), 3000);
       return () => clearTimeout(timeout);

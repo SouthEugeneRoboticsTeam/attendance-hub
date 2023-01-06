@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 type CheckHoursModalProps = {
   open: boolean;
-  account: { id: string };
+  account: { id: string } | null;
   createAccount: (accountId: string, name: string) => any;
   onClose?: () => any;
 };
@@ -10,20 +10,20 @@ type CheckHoursModalProps = {
 export default function CreateAccountModal(props: CheckHoursModalProps) {
   const { open, account, createAccount, onClose = () => {} } = props;
 
-  const [name, setName] = useState<string>(null);
+  const [name, setName] = useState<string | null>(null);
 
-  const nameInputRef = useRef(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setName(null);
 
     if (open) {
-      setTimeout(() => nameInputRef.current.focus(), 50);
+      setTimeout(() => nameInputRef.current?.focus(), 50);
     }
   }, [open]);
 
   const handleSubmit = useCallback(async () => {
-    if (!name) return;
+    if (!account || !name) return;
 
     await createAccount(account.id, name);
     onClose();

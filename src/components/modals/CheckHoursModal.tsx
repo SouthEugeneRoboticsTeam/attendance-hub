@@ -5,7 +5,7 @@ import { millisToHours } from '../../utils/format';
 
 type CheckHoursModalProps = {
   open: boolean;
-  account: Account;
+  account: Account | null;
   seasonId: string;
   onClose?: () => any;
 };
@@ -13,11 +13,11 @@ type CheckHoursModalProps = {
 export default function CheckHoursModal(props: CheckHoursModalProps) {
   const { open, account, seasonId, onClose = () => {} } = props;
 
-  const closeButtonRef = useRef(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (open) {
-      setTimeout(() => closeButtonRef.current.focus(), 50);
+      setTimeout(() => closeButtonRef.current?.focus(), 50);
     }
   }, [open]);
 
@@ -41,7 +41,7 @@ export default function CheckHoursModal(props: CheckHoursModalProps) {
             <tbody>
               <tr>
                 <td>{seasonId}</td>
-                <td>{millisToHours(account?.seasons?.[seasonId])}</td>
+                <td>{millisToHours(account?.seasons?.[seasonId] ?? 0)}</td>
               </tr>
               {inactiveSeasons.map(([season, time]) => (
                 <tr key={season}>
