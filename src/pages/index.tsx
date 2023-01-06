@@ -5,6 +5,7 @@ import Login from '../components/Login';
 import CheckHoursModal from '../components/modals/CheckHoursModal';
 import ConfigModal from '../components/modals/ConfigModal';
 import CreateAccountModal from '../components/modals/CreateAccountModal';
+import NoConnectionModal from '../components/modals/NoConnectionModal';
 import SignInModal from '../components/modals/SignInModal';
 import SignOutModal from '../components/modals/SignOutModal';
 
@@ -13,9 +14,13 @@ import * as EntryModel from '../models/Entry';
 import { db } from '../utils/firestore';
 
 import useConfig from '../utils/useConfig';
+import useConnection from '../utils/useConnection';
 
 function App() {
   const [showDbWarning, setShowDbWarning] = useState(false);
+  const isConnected = useConnection();
+
+  console.log(isConnected);
 
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
@@ -24,6 +29,7 @@ function App() {
   const [configModalOpen, setConfigModalOpen] = useState(false);
 
   const modals = [
+    !isConnected,
     signInModalOpen,
     signOutModalOpen,
     createAccountModalOpen,
@@ -149,6 +155,7 @@ function App() {
         seasonId={seasonId}
         onClose={() => setConfigModalOpen(false)}
       />
+      <NoConnectionModal open={!isConnected} />
 
       <div className="hero min-h-screen bg-base-200">
         <div className="hero-content flex flex-col  min-h-full justify-center max-w-xl lg:max-w-4xl">
