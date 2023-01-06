@@ -20,8 +20,6 @@ function App() {
   const [showDbWarning, setShowDbWarning] = useState(false);
   const isConnected = useConnection();
 
-  console.log(isConnected);
-
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);

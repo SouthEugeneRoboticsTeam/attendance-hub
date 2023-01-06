@@ -67,7 +67,7 @@
     "windows": [
       {
         "title": "SERT Attendance",
-        "fullscreen": false,
+        "fullscreen": true,
         "resizable": true,
         "width": 1920,
         "height": 1080
