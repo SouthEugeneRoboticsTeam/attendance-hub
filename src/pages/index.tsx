@@ -157,7 +157,7 @@ function App() {
 
       <div className="hero min-h-screen bg-base-200">
         <div className="hero-content flex flex-col  min-h-full justify-center max-w-xl lg:max-w-4xl">
-          <div className="flex flex-col lg:flex-row-reverse gap-8">
+          <div className="flex flex-col items-center lg:flex-row-reverse gap-8">
             <div className="text-center lg:text-left">
               <h1 className="text-5xl font-bold">SERT 2521</h1>
               <p className="py-6">
