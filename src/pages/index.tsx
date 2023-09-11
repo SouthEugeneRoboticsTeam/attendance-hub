@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { getVersion } from '@tauri-apps/api/app';
 
 import Login from '../components/Login';
 import CheckHoursModal from '../components/modals/CheckHoursModal';
@@ -38,6 +39,8 @@ function App() {
 
   const [account, setAccount] = useState<AccountModel.Account | null>(null);
   const [entry, setEntry] = useState<EntryModel.Entry | null>(null);
+
+  const [version, setVersion] = useState<string | null>(null);
 
   useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), {
     enableOnFormTags: true,
@@ -113,6 +116,10 @@ function App() {
     }
   }, [db]);
 
+  useEffect(() => {
+    getVersion().then(setVersion);
+  }, []);
+
   if (showDbWarning) {
     return (
       <div className="flex flex-col h-[100vh] items-center justify-center">
@@ -159,7 +166,7 @@ function App() {
       <NoConnectionModal open={!isConnected} />
 
       <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content flex flex-col  min-h-full justify-center max-w-xl lg:max-w-4xl">
+        <div className="hero-content flex flex-col min-h-full justify-center max-w-xl lg:max-w-4xl">
           <div className="flex flex-col items-center lg:flex-row-reverse gap-8">
             <div className="text-center lg:text-left">
               <h1 className="text-5xl font-bold">SERT 2521</h1>
@@ -180,6 +187,10 @@ function App() {
             />
           </div>
         </div>
+      </div>
+
+      <div className="absolute bottom-4 right-4">
+        <p className="text-md">v{version}</p>
       </div>
     </>
   );
