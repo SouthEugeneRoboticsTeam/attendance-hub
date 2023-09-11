@@ -23,9 +23,9 @@ export interface Entry extends EntryKeys {
   total?: number;
 }
 
-const getEntriesRef = () => collection(db!!, 'entries');
-const getUsersRef = () => collection(db!!, 'users');
-const getSeasonsRef = () => collection(db!!, 'seasons');
+const getEntriesRef = () => db && collection(db!!, 'entries');
+const getUsersRef = () => db && collection(db!!, 'users');
+const getSeasonsRef = () => db && collection(db!!, 'seasons');
 
 /**
  * Get entries from the database.
@@ -34,10 +34,13 @@ const getSeasonsRef = () => collection(db!!, 'seasons');
  * @returns the entries that match the conditions
  */
 export async function getEntries(conditions: Partial<EntryKeys>) {
+  const entriesRef = getEntriesRef();
+  if (!entriesRef) return null;
+
   const constraints = Object.entries(conditions).map(([key, value]) =>
     where(key, '==', value),
   );
-  const q = query(getEntriesRef(), ...constraints);
+  const q = query(entriesRef, ...constraints);
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((doc) => doc.data()) as Entry[];
@@ -50,10 +53,13 @@ export async function getEntries(conditions: Partial<EntryKeys>) {
  * @returns the current entry that matches the conditions
  */
 export async function getActiveEntry(conditions: Partial<EntryKeys>) {
+  const entriesRef = getEntriesRef();
+  if (!entriesRef) return null;
+
   const constraints = Object.entries(conditions).map(([key, value]) =>
     where(key, '==', value),
   );
-  const q = query(getEntriesRef(), ...constraints, where('timeOut', '==', 0));
+  const q = query(entriesRef, ...constraints, where('timeOut', '==', 0));
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs[0]?.data() as Entry;
@@ -70,6 +76,9 @@ export async function getAllEntries(
   seasonId: string | null = null,
   activeOnly = false,
 ) {
+  const entriesRef = getEntriesRef();
+  if (!entriesRef) return null;
+
   const constraints = [];
 
   if (seasonId) {
@@ -80,7 +89,7 @@ export async function getAllEntries(
     constraints.push(where('timeOut', '==', 0));
   }
 
-  const q = query(getEntriesRef(), ...constraints);
+  const q = query(entriesRef, ...constraints);
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((i) => i.data() as Entry);
@@ -94,6 +103,9 @@ export async function getAllEntries(
  * @returns the entry that was created
  */
 export async function signIn(accountId: string, seasonId: string) {
+  const entriesRef = getEntriesRef();
+  if (!entriesRef) return null;
+
   const timeIn = Date.now();
 
   const entry = {
@@ -104,7 +116,7 @@ export async function signIn(accountId: string, seasonId: string) {
     timeOut: 0,
   } as Entry;
 
-  await addDoc(getEntriesRef(), entry);
+  await addDoc(entriesRef, entry);
 
   return entry;
 }
@@ -121,10 +133,15 @@ export async function signOut(
   seasonId: string,
   forfeitTime = false,
 ) {
+  const entriesRef = getEntriesRef();
+  const usersRef = getUsersRef();
+  const seasonsRef = getSeasonsRef();
+  if (!entriesRef || !usersRef || !seasonsRef) return null;
+
   const timeOut = Date.now();
 
   const q = query(
-    getEntriesRef(),
+    entriesRef,
     where('accountId', '==', accountId),
     where('seasonId', '==', seasonId),
     where('timeOut', '==', 0),
@@ -145,8 +162,8 @@ export async function signOut(
     await updateDoc(entryDoc, { timeOut: -1, total: 0 });
   } else {
     await runTransaction(db!!, async (transaction) => {
-      const userDoc = doc(getUsersRef(), accountId);
-      const seasonDoc = doc(getSeasonsRef(), seasonId);
+      const userDoc = doc(usersRef, accountId);
+      const seasonDoc = doc(seasonsRef, seasonId);
 
       const season = await transaction.get(seasonDoc);
 

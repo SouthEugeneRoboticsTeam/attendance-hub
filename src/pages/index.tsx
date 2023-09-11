@@ -65,9 +65,9 @@ function App() {
 
       // signOut() updates account time, so account is now stale -- update manually here (rather than querying database again)
       if (account.seasons[seasonId]) {
-        account.seasons[seasonId] += entry.total ?? 0;
+        account.seasons[seasonId] += entry?.total ?? 0;
       } else {
-        account.seasons[seasonId] = entry.total ?? 0;
+        account.seasons[seasonId] = entry?.total ?? 0;
       }
 
       if (account) {
@@ -115,9 +115,12 @@ function App() {
 
   if (showDbWarning) {
     return (
-      <h1>
-        Please configure <code>firebase.json</code> and restart the app.
-      </h1>
+      <div className="flex flex-col h-[100vh] items-center justify-center">
+        <h1 className="text-5xl font-bold text-center">Missing Firebase Config</h1>
+        <h2 className="text-2xl text-center mt-4">
+          Please configure <code>firebase.json</code> and restart the app.
+        </h2>
+      </div>
     );
   }
 

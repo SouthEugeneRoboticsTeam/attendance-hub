@@ -42,7 +42,7 @@ export default function ConfigModal(props: ConfigModalProps) {
         <div className="mt-2 flex flex-col">
           <div className="flex flex-row gap-5">
             <MdWarning className="h-12 w-12 text-warning" />
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-error">
               Be careful when changing these settings. Modifying values here may
               reset attendance data for the current season.
             </p>

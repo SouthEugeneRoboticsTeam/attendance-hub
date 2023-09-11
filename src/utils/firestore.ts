@@ -1,20 +1,24 @@
 import { initializeApp } from 'firebase/app';
 import { Firestore, getFirestore } from 'firebase/firestore';
-import { BaseDirectory, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
+import { BaseDirectory, createDir, readTextFile, writeTextFile } from '@tauri-apps/api/fs';
 
 export let db: Firestore | null = null;
+
+const FIREBASE_CONFIG_PATH = 'firebase.json';
 
 export const initDb = async () => {
   if (!db) {
     try {
-      await readTextFile('firebase.json', { dir: BaseDirectory.AppConfig })
+      await readTextFile(FIREBASE_CONFIG_PATH, { dir: BaseDirectory.AppConfig })
         .then((config) => JSON.parse(config))
         .then((config) => {
           const app = initializeApp(config);
           db = getFirestore(app);
         });
     } catch {
-      await writeTextFile('firebase.json', '{}', {
+      // Create directory
+      await createDir('firebase', { dir: BaseDirectory.AppConfig, recursive: true });
+      await writeTextFile(FIREBASE_CONFIG_PATH, '{}', {
         dir: BaseDirectory.AppConfig,
       });
     }
