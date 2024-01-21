@@ -12,10 +12,11 @@ import SignOutModal from '../components/modals/SignOutModal';
 
 import * as AccountModel from '../models/Account';
 import * as EntryModel from '../models/Entry';
-import { db } from '../utils/firestore';
 
+import { FIREBASE_CONFIG_PATH, db } from '../utils/firestore';
 import useConfig from '../utils/useConfig';
 import useConnection from '../utils/useConnection';
+import { exportData } from '../utils/export';
 
 function App() {
   const [showDbWarning, setShowDbWarning] = useState(false);
@@ -42,9 +43,8 @@ function App() {
 
   const [version, setVersion] = useState<string | null>(null);
 
-  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), {
-    enableOnFormTags: true,
-  });
+  useHotkeys('ctrl+shift+c', () => setConfigModalOpen(true), { enableOnFormTags: true });
+  useHotkeys('ctrl+shift+e', async () => await exportData(), { enableOnFormTags: true });
 
   const config = useConfig();
   const seasonId = useMemo(() => config?.seasonId ?? 'default', [config]);
@@ -111,9 +111,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!db) {
-      setShowDbWarning(true);
-    }
+    setShowDbWarning(!db);
   }, [db]);
 
   useEffect(() => {
@@ -125,7 +123,7 @@ function App() {
       <div className="flex flex-col h-[100vh] items-center justify-center">
         <h1 className="text-5xl font-bold text-center">Missing Firebase Config</h1>
         <h2 className="text-2xl text-center mt-4">
-          Please configure <code>firebase.json</code> and restart the app.
+          Please configure <code>{FIREBASE_CONFIG_PATH}</code> and restart the app.
         </h2>
       </div>
     );

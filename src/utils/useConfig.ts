@@ -11,7 +11,8 @@ export default function useConfig() {
   useEffect(() => {
     readTextFile('config.json', { dir: BaseDirectory.AppConfig })
       .then((config) => JSON.parse(config))
-      .then((config) => setValue(config));
+      .then((config) => setValue(config))
+      .catch(() => setValue({}));
   }, []);
 
   return value;

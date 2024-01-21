@@ -4,7 +4,7 @@ import { BaseDirectory, createDir, readTextFile, writeTextFile } from '@tauri-ap
 
 export let db: Firestore | null = null;
 
-const FIREBASE_CONFIG_PATH = 'firebase.json';
+export const FIREBASE_CONFIG_PATH = 'firebase.json';
 
 export const initDb = async () => {
   if (!db) {
@@ -12,7 +12,7 @@ export const initDb = async () => {
       await readTextFile(FIREBASE_CONFIG_PATH, { dir: BaseDirectory.AppConfig })
         .then((config) => JSON.parse(config))
         .then((config) => {
-          const app = initializeApp(config);
+          const app = initializeApp(config, 'app');
           db = getFirestore(app);
         });
     } catch {

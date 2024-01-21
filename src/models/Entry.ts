@@ -4,6 +4,7 @@ import {
   doc,
   getDocs,
   increment,
+  orderBy,
   query,
   runTransaction,
   updateDoc,
@@ -88,6 +89,8 @@ export async function getAllEntries(
   if (activeOnly) {
     constraints.push(where('timeOut', '==', 0));
   }
+
+  constraints.push(orderBy('timeIn', 'desc'));
 
   const q = query(entriesRef, ...constraints);
   const querySnapshot = await getDocs(q);

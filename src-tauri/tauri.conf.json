@@ -23,6 +23,9 @@
       },
       "path": {
         "all": true
+      },
+      "dialog": {
+        "save": true
       }
     },
     "bundle": {
@@ -73,7 +76,7 @@
     "windows": [
       {
         "title": "SERT Attendance",
-        "fullscreen": true,
+        "fullscreen": false,
         "resizable": true,
         "width": 1920,
         "height": 1080

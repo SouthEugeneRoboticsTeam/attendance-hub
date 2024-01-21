@@ -1,9 +1,28 @@
 import * as exceljs from 'exceljs';
+import { save } from '@tauri-apps/api/dialog';
+import { writeBinaryFile } from '@tauri-apps/api/fs';
 
-import { Account } from '../models/Account';
-import { Entry } from '../models/Entry';
+import { Account, getAllAccounts } from '../models/Account';
+import { Entry, getAllEntries } from '../models/Entry';
 
-// @ts-ignore
+function getTimeOut(entry: Entry) {
+  if (entry.timeOut > 0) {
+    return new Date(entry.timeOut).toLocaleString();
+  } else if (entry.timeOut === -1) {
+    return 'did not sign out';
+  } else if (entry.timeOut === 0) {
+    return 'signed in';
+  }
+}
+
+function getTotal(entry: Entry) {
+  if (entry.timeOut > 0) {
+    return (entry.timeOut - entry.timeIn) / (3600 * 1000);
+  } else {
+    return null;
+  }
+}
+
 async function exportToXlsx(accounts: Account[], entries: Entry[]) {
   const workbook = new exceljs.Workbook();
   workbook.calcProperties.fullCalcOnLoad = true;
@@ -44,8 +63,8 @@ async function exportToXlsx(accounts: Account[], entries: Entry[]) {
     accountId: entry.accountId,
     seasonId: entry.seasonId,
     timeIn: new Date(entry.timeIn).toLocaleString(),
-    timeOut: new Date(entry.timeOut).toLocaleString(),
-    total: (entry.timeOut - entry.timeIn) / (3600 * 1000),
+    timeOut: getTimeOut(entry),
+    total: getTotal(entry),
   }));
 
   entriesWorksheet.addRows(entryRows);
@@ -74,4 +93,26 @@ async function exportToXlsx(accounts: Account[], entries: Entry[]) {
   const buffer = await workbook.xlsx.writeBuffer();
 
   return buffer;
+}
+
+export async function exportData() {
+  const accounts = await getAllAccounts();
+  const entries = await getAllEntries();
+
+  if (!entries) {
+    return;
+  }
+
+  const buffer = await exportToXlsx(accounts, entries);
+
+  const savePath = await save({
+    title: 'sert-attendance.xlsx',
+    defaultPath: 'sert-attendance.xlsx',
+  });
+
+  if (!savePath) {
+    return;
+  }
+
+  await writeBinaryFile(savePath, buffer);
 }
